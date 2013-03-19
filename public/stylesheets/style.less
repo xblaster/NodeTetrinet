@@ -1,0 +1,38 @@
+
+@gameColor : #373;
+@cellSize: 15px;
+
+body {
+  padding: 60px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: darken(@gameColor, 20%);
+}
+
+h1 {
+	color: lighten(@gameColor, 50%);	
+}
+
+a {
+  color: #00B7FF;
+}
+
+
+
+
+
+
+
+@borderColor: fadeout(@gameColor, 50%);
+
+
+.game-zone {
+	background-color: @gameColor;
+	border: 1px solid @borderColor;
+}
+
+.game-cell {
+	height: @cellSize;
+	width: @cellSize;
+	border-top: 1px solid @borderColor;
+	border-left: 1px solid @borderColor;
+}

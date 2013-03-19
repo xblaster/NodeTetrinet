@@ -1,0 +1,9 @@
+<h1>Mock</h1>
+
+<table class="game-zone">
+	<tr ng-repeat="line in zone">
+		<td ng-repeat="cell in line" ng-click="setCell(0, $index, 1)" ng-style="getStyleFor(cell)" class="game-cell">
+			
+		</td>
+	</tr>
+</table>

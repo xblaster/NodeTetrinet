@@ -1,0 +1,21 @@
+body {
+  padding: 60px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #143014;
+}
+h1 {
+  color: #c3e6c3;
+}
+a {
+  color: #00B7FF;
+}
+.game-zone {
+  background-color: #337733;
+  border: 1px solid rgba(51, 119, 51, 0.5);
+}
+.game-cell {
+  height: 15px;
+  width: 15px;
+  border-top: 1px solid rgba(51, 119, 51, 0.5);
+  border-left: 1px solid rgba(51, 119, 51, 0.5);
+}
