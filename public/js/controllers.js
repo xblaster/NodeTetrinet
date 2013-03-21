@@ -52,10 +52,7 @@ Block.prototype.rotate = function() {
 
 function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeout) {
 	
-	
-
-
-
+	var totalLine = 0;	
 
 	$scope.setCell = function (x, y, val) {
 		$scope.hiddenZone[x][y] = val;
@@ -111,22 +108,22 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 				   ;
 
 	var z_block = [
-				   [[0,0,0,0],
-				   [1,1,1,0],
-				   [0,1,0,0],
-				   [0,0,0,0]]
-				   ,
-				   [[0,1,0,0],
-				   [1,1,0,0],
-				   [0,1,0,0],
-				   [0,0,0,0]]
-				   ,
-				   [[0,1,0,0],
-				   [1,1,1,0],
+				   [[0,1,1,0],
+				   [0,0,1,1],
 				   [0,0,0,0],
 				   [0,0,0,0]]
 				   ,
-				   [[0,1,0,0],
+				   [[0,0,1,0],
+				   [0,1,1,0],
+				   [0,1,0,0],
+				   [0,0,0,0]]
+				   ,
+				   [[0,1,1,0],
+				   [0,0,1,1],
+				   [0,0,0,0],
+				   [0,0,0,0]]
+				   ,
+				  [[0,0,1,0],
 				   [0,1,1,0],
 				   [0,1,0,0],
 				   [0,0,0,0]]
@@ -135,24 +132,24 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 				   ;
 
 	var s_block = [
-				   [[0,0,0,0],
-				   [1,1,1,0],
-				   [0,1,0,0],
-				   [0,0,0,0]]
-				   ,
-				   [[0,1,0,0],
-				   [1,1,0,0],
-				   [0,1,0,0],
-				   [0,0,0,0]]
-				   ,
-				   [[0,1,0,0],
-				   [1,1,1,0],
+				   [[0,0,1,1],
+				   [0,1,1,0],
 				   [0,0,0,0],
 				   [0,0,0,0]]
 				   ,
-				   [[0,1,0,0],
+				   [[0,0,1,0],
+				   [0,0,1,1],
+				   [0,0,0,1],
+				   [0,0,0,0]]
+				   ,
+				   [[0,0,1,1],
 				   [0,1,1,0],
-				   [0,1,0,0],
+				   [0,0,0,0],
+				   [0,0,0,0]]
+				   ,
+				   [[0,0,1,0],
+				   [0,0,1,1],
+				   [0,0,0,1],
 				   [0,0,0,0]]
 				   
 				   ]
@@ -183,50 +180,50 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 				   ;
 
 	var l_block = [
-				   [[0,0,0,0],
-				   [1,1,1,0],
+				   [[0,1,0,0],
 				   [0,1,0,0],
+				   [0,1,1,0],
 				   [0,0,0,0]]
 				   ,
-				   [[0,1,0,0],
-				   [1,1,0,0],
-				   [0,1,0,0],
-				   [0,0,0,0]]
-				   ,
-				   [[0,1,0,0],
-				   [1,1,1,0],
+				   [[1,1,1,0],
+				   [1,0,0,0],
 				   [0,0,0,0],
 				   [0,0,0,0]]
 				   ,
-				   [[0,1,0,0],
-				   [0,1,1,0],
-				   [0,1,0,0],
+				   [[0,1,1,0],
+				   [0,0,1,0],
+				   [0,0,1,0],
 				   [0,0,0,0]]
+				   ,
+				   [[0,0,1,0],
+				   [1,1,1,0],
+				   [0,0,0,0],
+				   [0,0,0,0]]
+				   
 				   
 				   ]
 				   ;
 
 	var j_block = [
-				   [[0,0,0,0],
-				   [1,1,1,0],
-				   [0,1,0,0],
+				   [[0,0,1,0],
+				   [0,0,1,0],
+				   [0,1,1,0],
 				   [0,0,0,0]]
 				   ,
-				   [[0,1,0,0],
-				   [1,1,0,0],
-				   [0,1,0,0],
-				   [0,0,0,0]]
-				   ,
-				   [[0,1,0,0],
+				   [[1,0,0,0],
 				   [1,1,1,0],
 				   [0,0,0,0],
 				   [0,0,0,0]]
 				   ,
-				   [[0,1,0,0],
-				   [0,1,1,0],
+				   [[0,1,1,0],
+				   [0,1,0,0],
 				   [0,1,0,0],
 				   [0,0,0,0]]
-				   
+				    ,
+				   [[1,1,1,0],
+				   [0,0,1,0],
+				   [0,0,0,0],
+				   [0,0,0,0]]
 				   ];
 
 
@@ -279,7 +276,6 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 			current_block = getDroppedBlock(current_block);
 		}
 
-		console.log(event)
 		//refresh game screen
 		if (!event.force)//if not a force drop 
 		{
@@ -290,6 +286,31 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 	});
 
 	$timeout(sendDropTick, getGameTick());
+
+	var wallKick = function (zone, block) {
+		if (!testHitBlock(zone, block)) {
+			return block
+		}
+
+		var blockP = block.clone();
+
+		blockP.y = block.y -1;
+		if (!testHitBlock(zone, blockP)) return blockP;
+
+		blockP.y = block.y -2;
+		if (!testHitBlock(zone, blockP)) return blockP;
+
+		blockP.y = block.y +1;
+		if (!testHitBlock(zone, blockP)) return blockP;
+
+		blockP.y = block.y +2;
+		if (!testHitBlock(zone, blockP)) return blockP;
+
+		blockP.x = block.x -1;
+		if (!testHitBlock(zone, blockP)) return blockP;
+
+		return false;
+	}
 
 	$scope.$on('gameEvent', function(event, eventType) {
 
@@ -313,9 +334,14 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 			return;
 		}
 		
-		if (!testHitBlock($scope.hiddenZone, nextBlockPos)) {
-			current_block = nextBlockPos;
+		//handle wallkick if necessary
+		var finalBlockPos = wallKick($scope.hiddenZone,nextBlockPos);
+		if (finalBlockPos!==false) {
+			current_block = finalBlockPos;
 		}
+
+
+
 
 		$scope.refresh();
 		return;
@@ -330,7 +356,6 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 	}
 
 	function removeLine(zone, l) {
-		console.log("remove line "+l)
 		var returnZone = cloneZone(zone);
 		for (var i = l-1; i >= 0; i--) {
 			returnZone[i+1] = returnZone[i].slice(0);
