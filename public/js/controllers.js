@@ -28,6 +28,7 @@ function Block(pPattern) {
 
 	this.x = 0;
 	this.y = 0;
+	this.typeB = tetris.BlockType.BLUE;
 }
 	
 Block.prototype.clone =  function() {
@@ -35,6 +36,7 @@ Block.prototype.clone =  function() {
 			res.rotation = this.rotation;
 			res.x = this.x;
 			res.y = this.y;
+			res.typeB = this.typeB
 			return res;
 };
 	
@@ -67,7 +69,16 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 			return {backgroundColor: 'rgba(100,100,100,0.3)'};
 		} 
 		if (cell == tetris.BlockType.GHOST) {
-			return {boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.1)'};
+			return {backgroundColor: 'rgba(0,0,0,0.2)', boxShadow: 'inset 0px 0px 3px 1px rgba(255,255,255,0.1)'};
+		} 
+		if (cell == tetris.BlockType.GREEN) {
+			return {backgroundColor: 'rgba(0,255,0,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
+		} 
+		if (cell == tetris.BlockType.RED) {
+			return {backgroundColor: 'rgba(255,0,0,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
+		} 
+		if (cell == tetris.BlockType.BLUE) {
+			return {backgroundColor: 'rgba(0,0,255,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
 		} 
 		return {backgroundColor: 'rgba(0,255,0,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
 	}
@@ -248,6 +259,7 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 	var current_block = new Block(j_block);
 	current_block.x = 3; 
 	current_block.y = 4;
+	current_block.type = 5;
 
 	var sendDropTick = function() {
 		$rootScope.$broadcast('drop', {})
@@ -258,18 +270,23 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		return 1000;
 	}
 
-	$scope.$on('drop', function(event, eventType) {
-		console.log("drop");
+	$scope.$on('drop', function(eventType, event) {
 		if (testHitBlock($scope.hiddenZone, getDroppedBlock(current_block))) {
 			$scope.hiddenZone = addBlock($scope.hiddenZone, current_block);
-			askNewBlock();
+			$scope.hiddenZone = checkAndRemoveFullLine($scope.hiddenZone);
+			$scope.askNewBlock();
 		} else {
 			current_block = getDroppedBlock(current_block);
 		}
 
+		console.log(event)
 		//refresh game screen
+		if (!event.force)//if not a force drop 
+		{
+			$timeout(sendDropTick, getGameTick());
+		}
 		$scope.refresh();
-		$timeout(sendDropTick, getGameTick());
+		
 	});
 
 	$timeout(sendDropTick, getGameTick());
@@ -281,15 +298,19 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		if (eventType == tetris.GameEventEnum.UP) {
 			nextBlockPos.rotate() ;
 		} else if (eventType == tetris.GameEventEnum.DOWN) {
-			nextBlockPos.x +=1;
+			$rootScope.$broadcast('drop', {force: true})
+			return;
 		} else if (eventType == tetris.GameEventEnum.LEFT) {
 			nextBlockPos.y -=1;
 		} else if (eventType == tetris.GameEventEnum.RIGHT) {
 			nextBlockPos.y +=1;
 		} else if (eventType == tetris.GameEventEnum.DROP) {
 
-			$scope.hiddenZone = addBlock($scope.hiddenZone, getGravitiedBlock($scope.hiddenZone,nextBlockPos));
-			askNewBlock();			
+			current_block = getGravitiedBlock($scope.hiddenZone,nextBlockPos);
+			$rootScope.$broadcast('drop', {force: true})
+			//$scope.askNewBlock();			
+			$scope.refresh();
+			return;
 		}
 		
 		if (!testHitBlock($scope.hiddenZone, nextBlockPos)) {
@@ -305,8 +326,57 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		var ghostedZone = addBlock($scope.hiddenZone,getGravitiedBlock($scope.hiddenZone, current_block),tetris.BlockType.GHOST );
 		var withBlockZone = addBlock(ghostedZone,current_block);
 		applyZone(withBlockZone, $scope.zone);
-		console.log($scope.zone)
 		$scope.$digest();
+	}
+
+	function removeLine(zone, l) {
+		console.log("remove line "+l)
+		var returnZone = cloneZone(zone);
+		for (var i = l-1; i >= 0; i--) {
+			returnZone[i+1] = returnZone[i].slice(0);
+		};
+
+		//recreate first line
+		for (var j = 0; j< 14; j++) {
+			if (j <= 1 || j >=12) {
+				returnZone[0][j] = 1;
+			} else {
+				returnZone[0][j] = 0;
+			}
+		}
+
+		return returnZone;
+	}
+
+
+	function isFullLine(zone, l) {
+		for (var i = 0; i < zone[l].length; i++) {
+			if (zone[l][i]==tetris.BlockType.EMPTY ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	function checkAndRemoveFullLine(zone) {
+
+		var returnZone = cloneZone(zone);
+
+		var i = 21; //total line number;
+		var lineCounter = 0;
+
+		while (i >=0) {
+			if (isFullLine(returnZone,i)) {
+				returnZone = removeLine(returnZone, i);
+				
+				lineCounter++;
+			} else {
+				i--;
+			}
+		}
+
+		return returnZone;
 	}
 
 
@@ -328,12 +398,13 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		return gravitiedBlock;
 	}
 
-	function addBlock(zone, block) {
-		return addBlock(zone, block, tetris.BlockType.GREEN);
-	}
-
 	function addBlock(zone, block, type) {
-		var returnZone = cloneZone(zone);
+
+		if (type === undefined) {
+			type = block.typeB;
+		}
+
+			var returnZone = cloneZone(zone);
 		for (var i = 0; i < 4; i++) {
 			for (var j = 0; j < 4; j++) {
 				if (block.getPattern()[i][j]!= tetris.BlockType.EMPTY) {
@@ -344,10 +415,11 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		return returnZone;
 	}
 
-	function askNewBlock() {
+	$scope.askNewBlock = function () {
 		current_block = new Block(cloneZone(blocks[Math.floor(Math.random()*blocks.length)]));
 		current_block.x = 0;
 		current_block.y = 5;
+		current_block.typeB = 3+Math.floor(Math.random()*3);
 	}
 
 	function testHitBlock(zone, block) {
