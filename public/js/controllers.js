@@ -543,13 +543,14 @@ function ChatCtrl($scope) {
 	var socket = io.connect('http://localhost:3000/chat');
 
 	$scope.lines = [];
-	$scope.lines.push("hello");
-
 	$scope.p = "hihi";
 
 	socket.on('say', function(message) {
-		console.log("say");
 		$scope.lines.push(message);
+		if ($scope.lines.length >15) {
+			$scope.lines = $scope.lines.splice(-15);	
+		}
+		
 		//$scope.$digest();
 	});
 
@@ -558,8 +559,5 @@ function ChatCtrl($scope) {
 		$scope.message = "";
 	}
 
-	socket.emit("join","hello");
-	socket.emit("say","plop");
-
-
+	socket.emit("join",{roomName:"hello", nickname: "anon"+Math.floor(Math.random()*9999)});
 }

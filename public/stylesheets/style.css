@@ -31,3 +31,6 @@ div {
   width: 50%;
   float: right;
 }
+.shaded {
+  opacity: 0.5;
+}

@@ -1,11 +1,22 @@
-<div ng-controller="ChatCtrl">
+<div ng-controller="ChatCtrl" ng-class="{shaded : mode != 'chat'}">
+
+<h1>Controls</h1>
+
+<ul>
+	<li>&rarr;: move right</li>
+	<li>&larr;: move left</li>
+	<li>&uarr;: rotate</li>
+	<li>&darr;: move down</li>
+	<li>[Space]: drop</li>
+	<li>[Tab]: switch beetween game and chat</li>
+</ul>
 
 <h1>Chat</h1>
 	<div ng-repeat="line in lines">
-		{{line}}
+		{{line.at | date:'HH:mm:ss'}} @{{line.author}}: {{line.text}}
 	</div>
 	<form ng-submit="say()">
-			<input type="text" ng-model="message"/>
+			<input type="text" ng-model="message" id="message"/>
 			<button type="submit">say</button>
 	</form>
 </div>

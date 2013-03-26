@@ -56,14 +56,20 @@ io.of('/chat')
   .on('connection', function(socket) {
 
       var roomN;
+      var nickname;
 
-      socket.on('join', function(roomName) {
-        socket.join(roomName);
-        roomN = roomName;
+      socket.on('join', function(param) {
+        socket.join(param.roomName);
+        roomN = param.roomName;
+
+        nickname = param.nickname || "anonymous"
+
+        socket.emit('say',{author: 'server', text: "Welcome to game "+roomN, at: new Date().getTime()})
+
       });
 
       socket.on('say', function(message) {
-        io.of('/chat').in(roomN).emit('say', message);
+        io.of('/chat').in(roomN).emit('say', {author: nickname, text: message, at: new Date().getTime()});
       });
 
 

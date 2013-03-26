@@ -1,7 +1,7 @@
 
 <div class="right-panel" ng-include="'partials/chat.html'"></div>
 
-<div class="main-panel">
+<div class="main-panel" id="game" ng-class="{shaded : mode != 'game'}">
 	<table class="game-zone">
 		<tr ng-repeat="line in zone">
 			<td ng-repeat="cell in line" ng-style="getStyleFor(cell)" class="game-cell">
