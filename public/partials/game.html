@@ -1,9 +1,13 @@
-<h1>Mock</h1>
 
-<table class="game-zone">
-	<tr ng-repeat="line in zone">
-		<td ng-repeat="cell in line" ng-style="getStyleFor(cell)" class="game-cell">
-			
-		</td>
-	</tr>
-</table>
+<div class="right-panel" ng-include="'partials/chat.html'"></div>
+
+<div class="main-panel">
+	<table class="game-zone">
+		<tr ng-repeat="line in zone">
+			<td ng-repeat="cell in line" ng-style="getStyleFor(cell)" class="game-cell">
+
+			</td>
+		</tr>
+	</table>
+</div>
+

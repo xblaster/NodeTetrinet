@@ -46,7 +46,26 @@ server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
-io.sockets.on('connection', function(socket) {
+/*io.sockets.on('connection', function(socket) {
   console.log("connect from "+socket)
-});
+});*/
+
+
+//chat part
+io.of('/chat')
+  .on('connection', function(socket) {
+
+      var roomN;
+
+      socket.on('join', function(roomName) {
+        socket.join(roomName);
+        roomN = roomName;
+      });
+
+      socket.on('say', function(message) {
+        io.of('/chat').in(roomN).emit('say', message);
+      });
+
+
+  });
 

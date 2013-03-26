@@ -1,0 +1,11 @@
+<div ng-controller="ChatCtrl">
+
+<h1>Chat</h1>
+	<div ng-repeat="line in lines">
+		{{line}}
+	</div>
+	<form ng-submit="say()">
+			<input type="text" ng-model="message"/>
+			<button type="submit">say</button>
+	</form>
+</div>

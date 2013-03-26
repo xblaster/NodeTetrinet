@@ -537,3 +537,29 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 	//$scope.refresh();
 	
 };
+
+
+function ChatCtrl($scope) {
+	var socket = io.connect('http://localhost:3000/chat');
+
+	$scope.lines = [];
+	$scope.lines.push("hello");
+
+	$scope.p = "hihi";
+
+	socket.on('say', function(message) {
+		console.log("say");
+		$scope.lines.push(message);
+		//$scope.$digest();
+	});
+
+	$scope.say = function() {
+		socket.emit("say", $scope.message);
+		$scope.message = "";
+	}
+
+	socket.emit("join","hello");
+	socket.emit("say","plop");
+
+
+}
