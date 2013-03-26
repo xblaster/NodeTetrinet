@@ -561,3 +561,5 @@ function ChatCtrl($scope) {
 
 	socket.emit("join",{roomName:"hello", nickname: "anon"+Math.floor(Math.random()*9999)});
 }
+
+ChatCtrl.$inject['$scope'];
