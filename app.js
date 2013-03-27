@@ -89,6 +89,21 @@ io.of('/chat')
 
   });
 
+
+var availableRooms = {};
+
+var getOpenRoomList = function() {
+  var res = [];
+  for (key in availableRooms) {
+    res.push({'name': key});
+  }
+  return res;
+}
+
+var updatePeopleOnDiscover = function() {
+  io.of('/discover').emit('room', getOpenRoomList());
+}
+
 //game part
 io.of('/game')
   .on('connection', function(socket) {
@@ -97,37 +112,54 @@ io.of('/game')
       var nickname;
 
       socket.on('join', function(param) {
-
-
-
         socket.join(param.roomName);
         roomN = param.roomName;
 
         nickname = param.nickname || "anonymous"
 
         if (io.of('/game').clients(roomN).length == 1) {
+            availableRooms[roomN] = 1;
+            updatePeopleOnDiscover();
             socket.emit('owner');          
         }
 
         //socket.emit('start');
       });
 
+      socket.on('disconnect', function() {
+        console.log("disconnect");
+        if (io.of('/game').clients(roomN).length <= 1) {
+          delete availableRooms[roomN];
+          updatePeopleOnDiscover();
+        }
+      });
+
+      socket.on('leave', function() {
+        console.log("disconnect");
+        if (io.of('/game').clients(roomN).length <= 1) {
+          delete availableRooms[roomN];
+          updatePeopleOnDiscover();
+        }
+      });
+
 
       socket.on('start', function(opt) { 
         io.of('/game').in(roomN).emit('start');  
+        delete availableRooms[roomN];
+        updatePeopleOnDiscover();
       });
 
       socket.on('line', function(nbLine) {
         io.of('/game').in(roomN).except(socket).emit('addLines', nbLine -1);
 
-
       });
-
-      /*socket.on('say', function(message) {
-        io.of('/chat').in(roomN).emit('say', {author: nickname, text: message, at: new Date().getTime()});
-      });*/
-
 
   });
 
+io.of('/discover')
+  .on('connection', function(socket) {
+    socket.on('ask', function(param) {
+        socket.emit('room',getOpenRoomList());
+    });
+  });
 

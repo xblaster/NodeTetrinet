@@ -10,7 +10,7 @@ function($routeProvider) {
 		templateUrl : 'partials/game.html',
 		controller : GameCtrl
 	})
-	.when('/', {templateUrl: 'partials/index.html'})
+	.when('/', {templateUrl: 'partials/index.html', controller : IndexCtrl})
 	//.when('/avoir/:id', {templateUrl : 'partials/detailAvoir.html', controller: AvoirDetailCtrl})
 	.otherwise({
 		redirectTo : '/'

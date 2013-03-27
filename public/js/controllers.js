@@ -628,6 +628,11 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 	$scope.init();
 	$scope.askNewBlock();
 	//$scope.refresh();
+
+	$scope.$on("$destroy", function() {
+		socket.emit('leave', {});
+		socket.disconnect();
+	});
 	
 };
 
@@ -652,7 +657,23 @@ var ChatCtrl= function($scope, $routeParams) {
 		$scope.message = "";
 	}
 
+	$scope.$on("$destroy", function() {
+		socket.disconnect();
+	});
+
 	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
 }
 
 //ChatCtrl.$inject['$scope'];
+
+var IndexCtrl = function($scope) {
+	var socket = io.connect('http://localhost:3000/discover');
+	socket.on('room', function(event, eventType) {
+		console.log("room !!!!");
+		$scope.rooms = event;
+		$scope.$apply();
+	})
+
+	socket.emit('ask');
+}
+
