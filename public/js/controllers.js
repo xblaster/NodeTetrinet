@@ -50,9 +50,41 @@ Block.prototype.rotate = function() {
 
 
 
-function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeout) {
+function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeout, $routeParams) {
 	
+	var socket = io.connect('http://localhost:3000/game');
+	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
+
+
+	var current_block = [[]];
+
+	$scope.gameState = "";
+
+
+	socket.on('start', function(message) {
+		$scope.gameState = "on";
+		$scope.askNewBlock();
+		sendDropTick();
+	});
+
+	socket.on("addLines", function(nbline, eventType) {
+		console.log("addLines"+nbline);
+		$scope.hiddenZone = addAnnoyingLines($scope.hiddenZone, nbline);		
+		$scope.$apply();
+	})
+
+	socket.on("owner", function(opt, eventType) {
+		$scope.owner = 1;
+		$scope.$apply();
+	})
+
+
 	var totalLine = 0;	
+
+	$scope.launchGame = function() {
+		$scope.owner = 0;
+		socket.emit('start');
+	}
 
 	$scope.setCell = function (x, y, val) {
 		$scope.hiddenZone[x][y] = val;
@@ -253,10 +285,7 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 	var blocks = [i_block, z_block, s_block, o_block, l_block, j_block, t_block];
 
-	var current_block = new Block(j_block);
-	current_block.x = 3; 
-	current_block.y = 4;
-	current_block.type = 5;
+	
 
 	var sendDropTick = function() {
 		$rootScope.$broadcast('drop', {})
@@ -267,25 +296,33 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		return 1000;
 	}
 
-	$scope.$on('drop', function(eventType, event) {
-		if (testHitBlock($scope.hiddenZone, getDroppedBlock(current_block))) {
-			$scope.hiddenZone = addBlock($scope.hiddenZone, current_block);
-			$scope.hiddenZone = checkAndRemoveFullLine($scope.hiddenZone);
-			$scope.askNewBlock();
-		} else {
-			current_block = getDroppedBlock(current_block);
-		}
+	$scope.$on('blockOnFloor' , function(eventType, event) {
+		$scope.hiddenZone = addBlock($scope.hiddenZone, current_block);
+		$scope.hiddenZone = checkAndRemoveFullLine($scope.hiddenZone);
+		$scope.askNewBlock();
 
-		//refresh game screen
-		if (!event.force)//if not a force drop 
-		{
-			$timeout(sendDropTick, getGameTick());
-		}
+		//$timeout(sendDropTick, getGameTick());
 		$scope.refresh();
-		
 	});
 
-	$timeout(sendDropTick, getGameTick());
+	$scope.$on('drop', function(eventType, event) {
+		if ($scope.gameState != "on") { 
+			return;
+		}
+		if (testHitBlock($scope.hiddenZone, getDroppedBlock(current_block))) {
+			$rootScope.$broadcast('blockOnFloor');
+		} else {
+				current_block = getDroppedBlock(current_block);
+				//refresh game screen
+				if (!event.force)//if not a force drop 
+				{
+					
+					$timeout(sendDropTick, getGameTick());
+					
+				}
+				$scope.refresh();
+		}
+	});
 
 	var wallKick = function (zone, block) {
 		if (!testHitBlock(zone, block)) {
@@ -312,7 +349,17 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		return false;
 	}
 
+	$scope.$on('gameover', function(event, eventType) {
+		socket.emit("gameover",{});
+		$scope.gameState = "gameover";
+	});
+
 	$scope.$on('gameEvent', function(event, eventType) {
+
+		if ($scope.gameState != "on") {
+			return;
+		}
+
 
 		var nextBlockPos = current_block.clone();
 
@@ -329,7 +376,6 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 			current_block = getGravitiedBlock($scope.hiddenZone,nextBlockPos);
 			$rootScope.$broadcast('drop', {force: true})
-			//$scope.askNewBlock();			
 			$scope.refresh();
 			return;
 		}
@@ -373,6 +419,42 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		return returnZone;
 	}
 
+	function addAnnoyingLines(zone, lineNumber) {
+		var returnZone = cloneZone(zone);
+
+		var holeIndex = Math.floor(Math.random()*10)+2;
+
+		for (var i =0; i < lineNumber; i++) {
+			returnZone = addAnnoyingLine(returnZone, 21, holeIndex);
+		}
+
+		return returnZone;
+
+	}
+
+	function addAnnoyingLine(zone, l, holeIndex) {
+		var returnZone = cloneZone(zone);
+		for (var i = 0; i <= l; i++) {
+			returnZone[i-1] = returnZone[i].slice(0);
+		};
+
+		//recreate line where eveything begin
+		for (var j = 0; j< 14; j++) {
+			if (j <= 1 || j >=12) {
+				returnZone[l][j] = 1;
+			} else {
+				returnZone[l][j] = tetris.BlockType.BLUE;
+			}
+		}
+
+		returnZone[l][holeIndex] = 0;
+
+		return returnZone;
+	}
+
+
+	
+
 
 	function isFullLine(zone, l) {
 		for (var i = 0; i < zone[l].length; i++) {
@@ -399,6 +481,10 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 			} else {
 				i--;
 			}
+		}
+
+		if (lineCounter > 0) {
+			socket.emit('line',lineCounter);
 		}
 
 		return returnZone;
@@ -445,7 +531,13 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		current_block.x = 0;
 		current_block.y = 5;
 		current_block.typeB = 3+Math.floor(Math.random()*3);
-	}
+
+		//if block it on placement... game over
+		if (testHitBlock($scope.hiddenZone, current_block)) {
+			$rootScope.$broadcast('gameover');
+		}
+
+	}	
 
 	function testHitBlock(zone, block) {
 		for (var i = 0; i < 4; i++) {
@@ -534,12 +626,13 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 	}
 
 	$scope.init();
+	$scope.askNewBlock();
 	//$scope.refresh();
 	
 };
 
 
-function ChatCtrl($scope) {
+var ChatCtrl= function($scope, $routeParams) {
 	var socket = io.connect('http://localhost:3000/chat');
 
 	$scope.lines = [];
@@ -550,7 +643,7 @@ function ChatCtrl($scope) {
 		if ($scope.lines.length >15) {
 			$scope.lines = $scope.lines.splice(-15);	
 		}
-		
+		$scope.$apply();
 		//$scope.$digest();
 	});
 
@@ -559,7 +652,7 @@ function ChatCtrl($scope) {
 		$scope.message = "";
 	}
 
-	socket.emit("join",{roomName:"hello", nickname: "anon"+Math.floor(Math.random()*9999)});
+	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
 }
 
-ChatCtrl.$inject['$scope'];
+//ChatCtrl.$inject['$scope'];

@@ -13,6 +13,10 @@ var express = require('express')
 
 var app = express();
 
+
+var expressUglify = require('express-uglify');
+
+
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -26,7 +30,16 @@ app.configure(function(){
   app.use(express.session());
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
+
+  /*app.use(expressUglify.middleware({ 
+    src: __dirname + '/public',
+    logLevel: 'info'
+    //logger: new (winston.Logger)() // Specify your own winston logger or category
+  }));*/
+
   app.use(express.static(path.join(__dirname, 'public')));
+
+  
 
 });
 
@@ -75,4 +88,46 @@ io.of('/chat')
 
 
   });
+
+//game part
+io.of('/game')
+  .on('connection', function(socket) {
+
+      var roomN;
+      var nickname;
+
+      socket.on('join', function(param) {
+
+
+
+        socket.join(param.roomName);
+        roomN = param.roomName;
+
+        nickname = param.nickname || "anonymous"
+
+        if (io.of('/game').clients(roomN).length == 1) {
+            socket.emit('owner');          
+        }
+
+        //socket.emit('start');
+      });
+
+
+      socket.on('start', function(opt) { 
+        io.of('/game').in(roomN).emit('start');  
+      });
+
+      socket.on('line', function(nbLine) {
+        io.of('/game').in(roomN).except(socket).emit('addLines', nbLine -1);
+
+
+      });
+
+      /*socket.on('say', function(message) {
+        io.of('/chat').in(roomN).emit('say', {author: nickname, text: message, at: new Date().getTime()});
+      });*/
+
+
+  });
+
 

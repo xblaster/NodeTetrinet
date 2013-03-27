@@ -5,13 +5,15 @@
 
 angular.module('tetris', ['ng','TetrisService']).config(['$routeProvider',
 function($routeProvider) {
-	$routeProvider.when('/game', {
+
+	$routeProvider.when('/game/:id', {
 		templateUrl : 'partials/game.html',
 		controller : GameCtrl
 	})
+	.when('/', {templateUrl: 'partials/index.html'})
 	//.when('/avoir/:id', {templateUrl : 'partials/detailAvoir.html', controller: AvoirDetailCtrl})
 	.otherwise({
-		redirectTo : '/game'
+		redirectTo : '/'
 	});
 }])
 //on application start
@@ -25,7 +27,7 @@ function($routeProvider) {
 		$("#message").blur(function() {
 			$rootScope.mode = "game";
 			$("#game").focus();
-			//$rootScope.$digest();
+			$rootScope.$apply();
 		});
 
 		$("body").keydown(function(e) {
@@ -43,6 +45,8 @@ function($routeProvider) {
 					$("#game").focus();
 					$("#game").click();
 				}
+
+				$rootScope.$apply();
 			}
 
 			if ($rootScope.mode === "game") {
@@ -68,10 +72,10 @@ function($routeProvider) {
 
 	var socket = io.connect("http://localhost:3000");
 	socket.on('news', function(data) {
-		console.log(data);
+		//console.log(data);
 	}) 
 
-	console.log(socket);
+	//console.log(socket);
 
 });
 
