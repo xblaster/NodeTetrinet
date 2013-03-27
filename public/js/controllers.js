@@ -52,7 +52,7 @@ Block.prototype.rotate = function() {
 
 function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeout, $routeParams) {
 	
-	var socket = io.connect('http://localhost:3000/game');
+	var socket = io.connect(window.location.origin+'/game');
 	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
 
 
@@ -638,7 +638,7 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 
 var ChatCtrl= function($scope, $routeParams) {
-	var socket = io.connect('http://localhost:3000/chat');
+	var socket = io.connect(window.location.origin+'/chat');
 
 	$scope.lines = [];
 	$scope.p = "hihi";
@@ -667,7 +667,7 @@ var ChatCtrl= function($scope, $routeParams) {
 //ChatCtrl.$inject['$scope'];
 
 var IndexCtrl = function($scope) {
-	var socket = io.connect('http://localhost:3000/discover');
+	var socket = io.connect(window.location.origin+'/discover');
 	socket.on('room', function(event, eventType) {
 		console.log("room !!!!");
 		$scope.rooms = event;
