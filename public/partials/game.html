@@ -1,20 +1,45 @@
+<div class="row">
 
-<div class="right-panel" ng-include="'partials/chat.html'"></div>
+	<div class="span3" id="game" ng-class="{shaded : mode != 'game'}">
 
-<div class="main-panel" id="game" ng-class="{shaded : mode != 'game'}">
+		<table class="game-zone">
+			<tr ng-repeat="line in zone">
+				<td ng-repeat="cell in line" ng-class="getClassFor(cell)" class="game-cell">
 
-	<table class="game-zone">
-		<tr ng-repeat="line in zone">
-			<td ng-repeat="cell in line" ng-style="getStyleFor(cell)" class="game-cell">
+				</td>
+			</tr>
+		</table>
+		{{gameState}}
 
-			</td>
-		</tr>
-	</table>
-	{{gameState}}
+		<div ng-show="owner==1">
+			You are the owner of the room !<br/>
+			<a ng-click="launchGame()" class="btn btn-large">Launch the game</a>
+		</div>
 
-	<div ng-show="owner==1">
-		You are the owner of the room !<br/>
-		<a ng-click="launchGame()">Launch the game</a>
+		<div>
+		</div>
 	</div>
-</div>
 
+	<div class="span3">	
+		<div  ng-include="'partials/chat.html'"></div>
+
+		
+
+	</div>
+	<div class="span6">
+		<h2>GameZone</h2>
+		<div ng-repeat="(nickname, zone) in gameFields" class="span2">
+			<table class="game-zone">
+				<tr ng-repeat="line in zone">
+					<td ng-repeat="cell in line" ng-class="getClassFor(cell)" class="game-mini-cell">
+
+					</td>
+				</tr>
+			</table>
+			{{nickname}}
+		</div>
+	</div>
+	
+
+	
+</div>

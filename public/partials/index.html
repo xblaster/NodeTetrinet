@@ -1,14 +1,28 @@
+<div class="row">
+	<div class="hero-unit">
+		<h1>Node Tetrinet</h1>
+		<p>A fully funny and working implementation of multiplayer tetrinet battles with <a href="http://nodejs.org">node.js</a>
+		, <a href="http://angularjs.org">angularjs</a>,<a href="http://twitter.github.com/bootstrap">bootstrap</a> and <a href="http://socket.io">socket.io</a></p>
+	</div>
+</div>
+<div class="row">
+	<div class="span6">
+		<h1>Actions</h1>
+		<ul class="nav nav-list">
+			<li>
+				<a ng-click="startNewGame()">Start a new game </a>
+			</li>
+		</ul>
+	</div>
 
-
-<ul>
-	<li>
-		<a href="#/game/1234">Start a new game </a>
-	</li>
-</ul>
-
-<table>
-	<tr ng-repeat="room in rooms">
-		<td>{{room.name}}</td>
-		<td>Join</td>
-	</tr>
-</table>
+	<div class="span6">
+		<h1>Available rooms</h1>
+		<p ng-show="rooms.length == 0">No room</p>
+		<table class="table table-bordered table-striped" ng-show="rooms.length > 0">
+			<tr ng-repeat="room in rooms">
+				<td>{{room.name}}</td>
+				<td><a href="#/game/{{room.name}}" class="btn">join</a></td>
+			</tr>
+		</table>
+	</div>
+</div>

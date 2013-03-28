@@ -2,6 +2,9 @@
 @gameColor : #373;
 @cellSize: 15px;
 
+@textColor: lighten(@gameColor, 30%);
+@linkColor : lighten(@gameColor, 50%);
+
 body {
   padding: 60px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -13,7 +16,7 @@ h1 {
 }
 
 a {
-  color: #00B7FF;
+  color: @linkColor;
 }
 
 
@@ -53,4 +56,10 @@ p, div {
 
 .shaded {
 	opacity: 0.5;
+}
+
+.table {
+	width: 100%;
+	padding: 0.2em;
+	border: 1px solid @borderColor
 }

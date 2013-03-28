@@ -1,20 +1,36 @@
 <!DOCTYPE html>
 <html  lang="en" ng-app="tetris">
-  <head>
-    <title><%= title %></title>
-     <link rel='stylesheet' href='/stylesheets/bootstrap/bootstrap.css' />
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+<head>
+  <title><%= title %></title>
+  <link rel='stylesheet' href='/stylesheets/tetrinet.css' />
 
-    <script src="js/jquery-latest.js"></script>
-  	<script src="js/lib/angular.js"></script>
-    <script src="js/angular-resource.js"></script>
-  	<script src="js/app.js"></script>
-  	<script src="js/controllers.js"></script>
-    <script src="js/services.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-  </head>
-  <body>
-    
-   		<div ng-view class="container"></div>
-  </body>
+
+  <script src="js/jquery-latest.js"></script>
+  <script src="js/lib/angular.js"></script>
+  <script src="js/angular-resource.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/services.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#" style=""> Node Tetrinet</a>
+          <ul class="nav">
+            <li>
+              <a href="#/"></i> /</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-view class="container first-div"></div>
+</body>
 </html>

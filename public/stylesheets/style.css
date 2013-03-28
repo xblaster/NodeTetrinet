@@ -7,7 +7,7 @@ h1 {
   color: #c3e6c3;
 }
 a {
-  color: #00B7FF;
+  color: #c3e6c3;
 }
 p,
 div {
@@ -33,4 +33,9 @@ div {
 }
 .shaded {
   opacity: 0.5;
+}
+.table {
+  width: 100%;
+  padding: 0.2em;
+  border: 1px solid rgba(51, 119, 51, 0.5);
 }

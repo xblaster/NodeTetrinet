@@ -52,7 +52,7 @@ Block.prototype.rotate = function() {
 
 function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeout, $routeParams) {
 	
-	var socket = io.connect(window.location.origin+'/game');
+	var socket = io.connect( "http://"+window.location.host+'/game');
 	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
 
 
@@ -62,6 +62,7 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 
 	socket.on('start', function(message) {
+		socket.emit('updateGameField', $scope.hiddenZone);
 		$scope.gameState = "on";
 		$scope.askNewBlock();
 		sendDropTick();
@@ -78,6 +79,21 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		$scope.$apply();
 	})
 
+	//gamefield part
+
+	$scope.gameFields = {};
+
+	$scope.sendGameField = function() {
+		socket.emit('updateGameField', $scope.hiddenZone);
+	}
+
+	socket.on('updateGameField' , function(opt, eventType) {
+		console.log('updateGAMEFIELD !!!')
+		$scope.$apply(function() {
+			$scope.gameFields[opt.nickname] = opt.zone;	
+		})
+	});
+
 
 	var totalLine = 0;	
 
@@ -88,6 +104,14 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 	$scope.setCell = function (x, y, val) {
 		$scope.hiddenZone[x][y] = val;
+	}
+
+	$scope.getClassFor = function(cell) {
+
+		var res = {};
+		res['block'+cell] = true;
+
+		return res;
 	}
 
 	$scope.getStyleFor = function(cell) {
@@ -111,6 +135,7 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		} 
 		return {backgroundColor: 'rgba(0,255,0,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
 	}
+
 
 
 		//init gamezone
@@ -296,6 +321,8 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		return 1000;
 	}
 
+
+
 	$scope.$on('blockOnFloor' , function(eventType, event) {
 		$scope.hiddenZone = addBlock($scope.hiddenZone, current_block);
 		$scope.hiddenZone = checkAndRemoveFullLine($scope.hiddenZone);
@@ -303,9 +330,23 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 		//$timeout(sendDropTick, getGameTick());
 		$scope.refresh();
+
+		$scope.sendGameField();
 	});
 
+	
+
+
+
+
 	$scope.$on('drop', function(eventType, event) {
+
+		if (!event.force)//if not a force drop 
+		{
+			//launch next tick
+			$timeout(sendDropTick, getGameTick());
+		}
+
 		if ($scope.gameState != "on") { 
 			return;
 		}
@@ -314,12 +355,6 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 		} else {
 				current_block = getDroppedBlock(current_block);
 				//refresh game screen
-				if (!event.force)//if not a force drop 
-				{
-					
-					$timeout(sendDropTick, getGameTick());
-					
-				}
 				$scope.refresh();
 		}
 	});
@@ -627,6 +662,8 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 	$scope.init();
 	$scope.askNewBlock();
+
+
 	//$scope.refresh();
 
 	$scope.$on("$destroy", function() {
@@ -638,7 +675,7 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 
 
 var ChatCtrl= function($scope, $routeParams) {
-	var socket = io.connect(window.location.origin+'/chat');
+	var socket = io.connect( "http://"+window.location.host+'/chat');
 
 	$scope.lines = [];
 	$scope.p = "hihi";
@@ -666,13 +703,17 @@ var ChatCtrl= function($scope, $routeParams) {
 
 //ChatCtrl.$inject['$scope'];
 
-var IndexCtrl = function($scope) {
-	var socket = io.connect(window.location.origin+'/discover');
+var IndexCtrl = function($scope, $location) {
+	var socket = io.connect( "http://"+window.location.host+'/discover');
 	socket.on('room', function(event, eventType) {
 		console.log("room !!!!");
 		$scope.rooms = event;
 		$scope.$apply();
 	})
+
+	$scope.startNewGame = function() {
+		$location.path("/game/"+Math.floor(Math.random()*9999));
+	}
 
 	socket.emit('ask');
 }

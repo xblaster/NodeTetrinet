@@ -111,8 +111,12 @@ io.of('/game')
       var roomN;
       var nickname;
 
+
+
       socket.on('join', function(param) {
+
         socket.join(param.roomName);
+
         roomN = param.roomName;
 
         nickname = param.nickname || "anonymous"
@@ -134,6 +138,11 @@ io.of('/game')
         }
       });
 
+      
+      socket.on('updateGameField', function(opt) { 
+        io.of('/game').in(roomN).emit('updateGameField', {'nickname': nickname, 'zone': opt });  
+      });
+
       socket.on('leave', function() {
         console.log("disconnect");
         if (io.of('/game').clients(roomN).length <= 1) {
@@ -150,8 +159,15 @@ io.of('/game')
       });
 
       socket.on('line', function(nbLine) {
-        io.of('/game').in(roomN).except(socket).emit('addLines', nbLine -1);
-
+        //doesn't work
+        //io.of('/game').in(roomN).except(socket).emit('addLines', nbLine); 
+        for (var id in io.of('/game').clients(roomN)) {
+          var loopSockId = io.of('/game').clients(roomN)[id].id
+          if(socket.id !== loopSockId) {
+            //io.clients[id].send('addLines', nbLine);
+            io.of('/game').in(roomN).socket(loopSockId).emit('addLines', nbLine);
+          }
+        }
       });
 
   });

@@ -1,0 +1,265 @@
+
+.buttonBackground(@startColor, @endColor, @textColor: #fff, @textShadow: 0 -1px 0 rgba(0,0,0,.25)) {
+	background-color: @endColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+
+
+	// in these cases the gradient won't cover the background, so we override
+	&:hover, &:active, &.active, &.disabled, &[disabled] {
+		color: @textColor;
+		background-color: darken(@endColor, 5%);
+	}
+
+	// IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
+	&:active,
+	&.active {
+		background-color: darken(@endColor, 10%) e("\9");
+	}
+}
+
+@import "bootstrap/less/bootstrap.less"; // include main bootstrap
+@import "bootstrap/less/responsive.less"; // Modify this for custom colors, font-sizes, etc
+
+
+
+
+@gameColorSec : spin(@gameColor,-50);
+@cellSize: 15px;
+
+@textColor: lighten(@gameColor, 5%);
+
+@bodyBackground:      darken(@gameColor, 20%);
+
+// Links
+// -------------------------
+@linkColor:             lighten(@gameColor,55%);
+@linkColorHover:        lighten(@linkColor, 15%);
+
+
+/************* font ****************/
+@font-face {
+	font-family: 'Roboto Condensed';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Roboto Condensed Regular'), local('RobotoCondensed-Regular'), url(roboto.woff) format('woff');
+}
+
+
+// Navbar
+// -------------------------
+@navbarCollapseWidth:             979px;
+@navbarCollapseDesktopWidth:      @navbarCollapseWidth + 1;
+
+@navbarHeight:                    40px;
+@navbarBackgroundHighlight:   	  @gameColor;
+@navbarBackground:                darken(@navbarBackgroundHighlight, 5%);
+@navbarBorder:                    darken(@gameColor, 12%);
+
+@navbarText:                      #EEE;
+@navbarLinkColor:                 white;
+@navbarLinkColorHover:            lighten(@navbarLinkColor, 15%);
+@navbarLinkColorActive:           lighten(@navbarLinkColor, 15%);
+@navbarLinkBackgroundHover:       rgba(255,255,255,0.2);
+@navbarLinkBackgroundActive:      @gameColorSec;
+
+@navbarBrandColor:                @navbarLinkColor;
+
+.nav > li > a:hover {
+	text-decoration: none;
+	background-color: lighten(@bodyBackground,10%);
+}
+
+// Tables
+// -------------------------
+@tableBackground:                   transparent; // overall background-color
+@tableBackgroundAccent:             fadeout(@gameColor,50%); // for striping
+@tableBackgroundHover:              fadeout(@gameColor,20%); // for hover
+@tableBorder:                       @gameColor; // table and cell border
+
+// Hero unit
+// -------------------------
+@heroUnitBackground:              lighten(@bodyBackground,5%);
+@heroUnitHeadingColor:            lighten(@textColor,70%);
+@heroUnitLeadColor:               @textColor;
+
+
+
+//@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 20%);
+
+@btnPrimaryBackgroundHighlight:     lighten(@btnPrimaryBackground, 10%);
+
+
+#sidemenu li.active a {
+	background-color: @gameColorSec !important;
+	color: white;
+}
+
+@paginationBorder:                   lighten(@gameColor,25%); 
+@paginationActiveBackground:         lighten(@gameColor,40%); 
+
+
+
+body {
+	-webkit-transform:perspective(600);
+}
+
+
+
+body, button.btn {
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+
+
+
+h1 {
+	color: lighten(@gameColor, 50%);	
+}
+
+a {
+	color: @linkColor;
+}
+
+
+p, div {
+	color: lighten(@gameColor, 30%);	
+}
+
+
+
+
+
+
+@borderColor: fadeout(@gameColor, 80%);
+
+
+.game-zone {
+	background-color: @gameColor;
+	border: 1px solid @borderColor;
+}
+
+.game-mini-cell {
+	height: 3px;
+	width: 3px;
+	border-top: 1px solid @borderColor;
+	border-left: 1px solid @borderColor;
+}
+
+
+.game-cell {
+	height: @cellSize;
+	width: @cellSize;
+	border-top: 1px solid @borderColor;
+	border-left: 1px solid @borderColor;
+}
+
+
+.right-panel {
+	width: 50%;
+	float: right;
+}
+
+.shaded {
+	opacity: 0.5;
+}
+
+.first-div {
+	margin-top: @navbarHeight;
+	padding-top: 10px;
+}
+.btn {
+	.border-radius(0);
+	.box-shadow(~"inset 0 0px 0 rgba(255,255,255,.2), 0 0px 0px rgba(0,0,0,.05)");
+	border: 1px solid @gameColor;
+	border-color: #c5c5c5;
+	border-color: rgba(0,0,0,.15) rgba(0,0,0,.15) rgba(0,0,0,.25);
+	color: #FFF;
+	background-color: @gameColor;
+}
+
+.btn:hover {
+	color: #FFF;
+	background-color: lighten(@gameColor,10%);
+}
+
+.btn-primary {
+	background-color: @btnPrimaryBackground;
+	color: #FFF;
+}
+// Warning appears are orange
+.btn-warning {
+	background-color: @btnWarningBackground;
+	color: #FFF;
+}
+// Danger and error appear as red
+.btn-danger {
+	background-color: @btnDangerBackground;
+	color: #FFF;
+}
+// Success appears as green
+.btn-success {
+	background-color: @btnSuccessBackground;
+	color: #FFF;
+}
+// Info appears as a neutral blue
+.btn-info {
+	background-color: @btnInfoBackground;
+	color: #FFF;
+}
+// Inverse appears as dark gray
+.btn-inverse {
+	background-color: @btnInverseBackground;
+	color: #FFF;
+}
+
+
+
+/*tetris.BlockType = {
+	EMPTY: 0,
+	GREY: 1,
+	CYAN: 2,
+	GREEN: 3,
+	RED: 4,
+	BLUE: 5,
+	GHOST: 999
+}*/
+
+/*empty*/
+.block0 {
+	background-color: @bodyBackground;
+}
+
+
+/* grey */
+.block1 {
+	background-color: mix(@bodyBackground, @gameColor, 50%);
+}
+
+
+@greenBlock: mix(@bodyBackground, #0F0, 70%);
+@redBlock: mix(@bodyBackground, #F00, 70%);
+@blueBlock: mix(@bodyBackground, #00F, 70%);
+
+/* green */
+.block3 {
+	background-color: @greenBlock;
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@greenBlock, 10%), 30%);
+}
+
+/* red */
+.block4{
+	background-color: mix(@bodyBackground, red, 70%);
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@redBlock, 20%), 30%);
+}
+
+/* blue */
+.block5{
+	background-color: mix(@bodyBackground, blue, 70%);
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@blueBlock, 30%), 30%);
+}
+
+
+.block999 {
+	background-color: mix(@bodyBackground, white, 95%);
+	box-shadow: inset 0px 0px 1px 1px rgba(255,255,255,0.1);
+}
+

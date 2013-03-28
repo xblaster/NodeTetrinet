@@ -13,10 +13,10 @@
 
 <h1>Chat</h1>
 	<div ng-repeat="line in lines">
-		{{line.at | date:'HH:mm:ss'}} @{{line.author}}: {{line.text}}
+		<small>{{line.at | date:'HH:mm:ss'}}</small><b>&lt;{{line.author}}&gt;</b> {{line.text}}
 	</div>
 	<form ng-submit="say()">
 			<input type="text" ng-model="message" id="message"/>
-			<button type="submit">say</button>
+			<button class="btn btn-mini" type="submit">say</button>
 	</form>
 </div>
