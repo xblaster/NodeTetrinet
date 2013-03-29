@@ -18,7 +18,7 @@ var expressUglify = require('express-uglify');
 
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', process.env.PORT || 80);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(express.favicon());
@@ -165,7 +165,7 @@ io.of('/game')
           var loopSockId = io.of('/game').clients(roomN)[id].id
           if(socket.id !== loopSockId) {
             //io.clients[id].send('addLines', nbLine);
-            io.of('/game').in(roomN).socket(loopSockId).emit('addLines', nbLine);
+            io.of('/game').in(roomN).socket(loopSockId).emit('addLines', nbLine-1);
           }
         }
       });
