@@ -28,15 +28,15 @@
 	</div>
 	<div class="span6">
 		<h2>GameZone</h2>
-		<div ng-repeat="(nickname, zone) in gameFields" class="span2">
+		<div ng-repeat="(nickname, opt) in gameFields" class="span2">
 			<table class="game-zone">
-				<tr ng-repeat="line in zone">
+				<tr ng-repeat="line in opt.zone">
 					<td ng-repeat="cell in line" ng-class="getClassFor(cell)" class="game-mini-cell">
 
 					</td>
 				</tr>
 			</table>
-			{{nickname}}
+			{{nickname}} / {{opt.status}}
 		</div>
 	</div>
 	

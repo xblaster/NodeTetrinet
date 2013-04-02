@@ -14,8 +14,6 @@ var express = require('express')
 var app = express();
 
 
-var expressUglify = require('express-uglify');
-
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -141,6 +139,10 @@ io.of('/game')
       
       socket.on('updateGameField', function(opt) { 
         io.of('/game').in(roomN).emit('updateGameField', {'nickname': nickname, 'zone': opt });  
+      });
+
+      socket.on('gameover', function(opt) { 
+        io.of('/game').in(roomN).emit('opponentGameOver', {'nickname': nickname });  
       });
 
       socket.on('leave', function() {

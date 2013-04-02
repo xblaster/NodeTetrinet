@@ -12,8 +12,8 @@ module.exports = function(grunt) {
       },
       my_target: {
         files: {
-          '<%= distdir %>/src/js/app.js': 'src/js/app.js',
-          '<%= distdir %>/src/js/controllers.js': 'src/js/controllers.js'
+          '<%= distdir %>/src/public/js/app.js': 'src/public/js/app.js',
+          '<%= distdir %>/src/public/js/controllers.js': 'src/public/js/controllers.js'
           
         }
       }
@@ -37,8 +37,29 @@ module.exports = function(grunt) {
      }
    },
 
-  ,
-
+  
+jshint: {
+      options: {
+        curly: true,
+        eqeqeq: true,
+        immed: true,
+        latedef: true,
+        newcap: true,
+        node: true,
+        noarg: true,
+        sub: true,
+        undef: true,
+        boss: true,
+        eqnull: true,
+        browser: true
+      },
+      globals: {
+        angular: true,
+        jQuery: true
+      },
+      all: ['src/public/js/app.js','src/public/js/controllers.js',
+            'src/app.js']
+    },
 
 copy: {
   main: {
@@ -56,9 +77,9 @@ copy: {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-less');
 
-  grunt.loadNpmTasks('grunt-string-replace');
+   grunt.loadNpmTasks('grunt-contrib-jshint');
 
   // Default task(s).
-  grunt.registerTask('default', ['clean','copy','string-replace','less','uglify']);
+  grunt.registerTask('default', ['clean','copy','less','uglify'/*,'jshint'*/]);
 
 };

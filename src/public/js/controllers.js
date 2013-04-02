@@ -50,7 +50,7 @@ Block.prototype.rotate = function() {
 
 
 
-function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeout, $routeParams) {
+function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) {
 	
 	var socket = io.connect( "http://"+window.location.host+'/game');
 	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
@@ -88,10 +88,35 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 	}
 
 	socket.on('updateGameField' , function(opt, eventType) {
-		console.log('updateGAMEFIELD !!!')
+		//console.log('updateGAMEFIELD !!!')
 		$scope.$apply(function() {
-			$scope.gameFields[opt.nickname] = opt.zone;	
+			$scope.gameFields[opt.nickname] = $scope.gameFields[opt.nickname] || {};
+			$scope.gameFields[opt.nickname].zone = opt.zone;	
 		})
+	});
+
+	socket.on('opponentGameOver' , function(opt, eventType) {
+		$scope.$apply(function() {
+			$scope.gameFields[opt.nickname] = $scope.gameFields[opt.nickname] || {};
+			$scope.gameFields[opt.nickname].status = "gameover";	
+		});
+
+
+		var winner = true;
+		//check if you're the latest to play
+		/*for (nickname in $scope.gameFields) {
+			if ($scope.gameFields[nickname].status !== "gameover") {
+				winner = false;
+			}
+		}
+
+		if (winner) {
+			$scope.$broadcast('youwin', {});
+		}*/
+	});
+	
+	$scope.$on('youwin', function(event, eventType) {		//socket.emit("gameover",{});
+		$scope.gameState = "You win !";
 	});
 
 
@@ -421,9 +446,6 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 			current_block = finalBlockPos;
 		}
 
-
-
-
 		$scope.refresh();
 		return;
 	});
@@ -674,6 +696,8 @@ function GameCtrl($scope, $http, $location, GameZoneService, $rootScope, $timeou
 };
 
 
+GameCtrl.$inject = ['$scope', '$http', '$location', '$rootScope', '$timeout', '$routeParams'];
+
 var ChatCtrl= function($scope, $routeParams) {
 	var socket = io.connect( "http://"+window.location.host+'/chat');
 
@@ -703,6 +727,8 @@ var ChatCtrl= function($scope, $routeParams) {
 
 //ChatCtrl.$inject['$scope'];
 
+ChatCtrl.$inject = ['$scope', '$routeParams'];
+
 var IndexCtrl = function($scope, $location) {
 	var socket = io.connect( "http://"+window.location.host+'/discover');
 	socket.on('room', function(event, eventType) {
@@ -718,3 +744,5 @@ var IndexCtrl = function($scope, $location) {
 	socket.emit('ask');
 }
 
+
+IndexCtrl.$inject = ['$scope', '$location'];
