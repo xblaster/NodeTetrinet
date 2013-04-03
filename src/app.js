@@ -128,8 +128,11 @@ io.of('/game')
         //socket.emit('start');
       });
 
+      socket.on('win', function() {
+        io.of('/chat').in(roomN).emit('say',{author: 'server', text: nickname+" has won the game !", at: new Date().getTime()});
+      });
+
       socket.on('disconnect', function() {
-        console.log("disconnect");
         if (io.of('/game').clients(roomN).length <= 1) {
           delete availableRooms[roomN];
           updatePeopleOnDiscover();
@@ -138,15 +141,16 @@ io.of('/game')
 
       
       socket.on('updateGameField', function(opt) { 
-        io.of('/game').in(roomN).emit('updateGameField', {'nickname': nickname, 'zone': opt });  
+        //io.of('/game').in(roomN).emit('updateGameField', {'nickname': nickname, 'zone': opt });  
+        sendToAllButYou('updateGameField', {'nickname': nickname, 'zone': opt }, '/game', roomN, socket.id);
       });
 
       socket.on('gameover', function(opt) { 
-        io.of('/game').in(roomN).emit('opponentGameOver', {'nickname': nickname });  
+        //io.of('/game').in(roomN).emit('opponentGameOver', {'nickname': nickname });  
+        sendToAllButYou('opponentGameOver', {'nickname': nickname }, '/game', roomN, socket.id);
       });
 
       socket.on('leave', function() {
-        console.log("disconnect");
         if (io.of('/game').clients(roomN).length <= 1) {
           delete availableRooms[roomN];
           updatePeopleOnDiscover();
@@ -163,14 +167,25 @@ io.of('/game')
       socket.on('line', function(nbLine) {
         //doesn't work
         //io.of('/game').in(roomN).except(socket).emit('addLines', nbLine); 
-        for (var id in io.of('/game').clients(roomN)) {
+       /* for (var id in io.of('/game').clients(roomN)) {
           var loopSockId = io.of('/game').clients(roomN)[id].id
           if(socket.id !== loopSockId) {
             //io.clients[id].send('addLines', nbLine);
             io.of('/game').in(roomN).socket(loopSockId).emit('addLines', nbLine);
           }
-        }
+        }*/
+        sendToAllButYou('addLines', nbLine, '/game', roomN, socket.id);
       });
+
+      var sendToAllButYou = function(msgType, msgContent, of, room, socketId) {
+        for (var id in io.of(of).clients(room)) {
+          var loopSockId = io.of(of).clients(room)[id].id
+          if(socketId !== loopSockId) {
+            //io.clients[id].send('addLines', nbLine);
+            io.of(of).in(room).socket(loopSockId).emit(msgType, msgContent);
+          }
+        }
+      }
 
   });
 

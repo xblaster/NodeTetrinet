@@ -53,7 +53,7 @@ Block.prototype.rotate = function() {
 function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) {
 	
 	var socket = io.connect( "http://"+window.location.host+'/game');
-	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
+	socket.emit("join",{roomName: $routeParams.id, nickname: $rootScope.nickname});
 
 
 	var current_block = [[]];
@@ -104,7 +104,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 		var winner = true;
 		//check if you're the latest to play
-		/*for (nickname in $scope.gameFields) {
+		for (var nickname in $scope.gameFields) {
 			if ($scope.gameFields[nickname].status !== "gameover") {
 				winner = false;
 			}
@@ -112,11 +112,15 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 		if (winner) {
 			$scope.$broadcast('youwin', {});
-		}*/
+		}
 	});
 	
 	$scope.$on('youwin', function(event, eventType) {		//socket.emit("gameover",{});
-		$scope.gameState = "You win !";
+		if ($scope.gameState!== "You win !") {
+			$scope.gameState = "You win !";
+			socket.emit('win');
+		}
+		
 	});
 
 
@@ -362,14 +366,20 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	
 
 
+	var timeoutId;
 
+	//if destroy, remove ticket
+	//TODO find a more elegant way to do that
+	$scope.$on("$destroy", function(event, eventType) {
+		$timeout.cancel(timeoutId);
+	});
 
 	$scope.$on('drop', function(eventType, event) {
 
 		if (!event.force)//if not a force drop 
 		{
-			//launch next tick
-			$timeout(sendDropTick, getGameTick());
+			//launch next tick and store timeout id
+			timeoutId = $timeout(sendDropTick, getGameTick());
 		}
 
 		if ($scope.gameState != "on") { 

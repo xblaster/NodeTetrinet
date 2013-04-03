@@ -7638,6 +7638,11 @@ div {
 .shaded {
   opacity: 0.5;
 }
+.gray {
+  filter: gray;
+  -webkit-filter: grayscale(100%);
+  -moz-filter: grayscale(100%);
+}
 .first-div {
   margin-top: 40px;
   padding-top: 10px;

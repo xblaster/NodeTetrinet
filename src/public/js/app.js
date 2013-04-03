@@ -22,6 +22,9 @@ function($routeProvider) {
 }])
 //on application start
 .run(function($rootScope) {
+
+	$rootScope.nickname = $rootScope.nickname || "anon"+Math.floor(Math.random()*9999);
+
 	$(document).ready(function() {
 
 
