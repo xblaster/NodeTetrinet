@@ -174,7 +174,12 @@ io.of('/game')
             io.of('/game').in(roomN).socket(loopSockId).emit('addLines', nbLine);
           }
         }*/
-        sendToAllButYou('addLines', nbLine, '/game', roomN, socket.id);
+        if (nbLine <4) {
+          sendToAllButYou('addLines', nbLine-1, '/game', roomN, socket.id);  
+        } else {
+          sendToAllButYou('addLines', nbLine, '/game', roomN, socket.id);  
+        }
+        
       });
 
       var sendToAllButYou = function(msgType, msgContent, of, room, socketId) {
