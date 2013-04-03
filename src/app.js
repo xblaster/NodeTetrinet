@@ -27,7 +27,7 @@ app.configure(function(){
   app.use(express.cookieParser('your secret here'));
   app.use(express.session());
   app.use(app.router);
-  app.use(require('less-middleware')({ src: __dirname + '/public' }));
+  //app.use(require('less-middleware')({ src: __dirname + '/public' }));
 
   /*app.use(expressUglify.middleware({ 
     src: __dirname + '/public',
@@ -44,6 +44,11 @@ app.configure(function(){
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
+//configure for production
+io.enable('browser client minification');
+io.enable('browser client etag');
+io.enable('browser client gzip');
+io.set('log level',1);
 
 
 app.configure('development', function(){
