@@ -7,7 +7,7 @@ if (typeof console==="undefined"|| typeof console.log === "undefined") {
 	console.log = function(){};
 }
 
-angular.module('tetris', ['ng','TetrisService']).config(['$routeProvider',
+angular.module('tetris', ['ng','ngCookies']).config(['$routeProvider',
 function($routeProvider) {
 
 	$routeProvider.when('/game/:id', {
@@ -21,9 +21,10 @@ function($routeProvider) {
 	});
 }])
 //on application start
-.run(function($rootScope) {
+.run(['$rootScope', '$cookies',function($rootScope, $cookies) {
 
-	$rootScope.nickname = $rootScope.nickname || "anon"+Math.floor(Math.random()*9999);
+	$cookies.nickname = $cookies.nickname || "Anonymous"+Math.floor(Math.random()*9999);
+	$rootScope.nickname =  $cookies.nickname;
 
 	$(document).ready(function() {
 
@@ -75,5 +76,5 @@ function($routeProvider) {
 			}
 		});
 	})
-});
+}]);
 

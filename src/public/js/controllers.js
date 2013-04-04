@@ -708,7 +708,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 GameCtrl.$inject = ['$scope', '$http', '$location', '$rootScope', '$timeout', '$routeParams'];
 
-var ChatCtrl= function($scope, $routeParams) {
+var ChatCtrl= function($scope, $routeParams, $rootScope) {
 	var socket = io.connect( "http://"+window.location.host+'/chat');
 
 	$scope.lines = [];
@@ -732,14 +732,29 @@ var ChatCtrl= function($scope, $routeParams) {
 		socket.disconnect();
 	});
 
-	socket.emit("join",{roomName: $routeParams.id, nickname: "anon"+Math.floor(Math.random()*9999)});
+	socket.emit("join",{roomName: $routeParams.id, nickname: $rootScope.nickname});
 }
 
 //ChatCtrl.$inject['$scope'];
 
-ChatCtrl.$inject = ['$scope', '$routeParams'];
+ChatCtrl.$inject = ['$scope', '$routeParams','$rootScope'];
 
-var IndexCtrl = function($scope, $location) {
+var IndexCtrl = function($scope, $location, $rootScope, $cookies) {
+
+	$scope.mode = 'read';
+
+
+	$scope.changeMode = function(mode) { $scope.mode = mode ;}
+
+	$scope.isAnonymous = function() {
+		return ($rootScope.nickname.indexOf("Anonymous")===-1);
+	}
+
+	$scope.changeNickname = function(nickname) {
+		$rootScope.nickname = nickname;
+		$cookies.nickname = nickname; 
+	}
+
 	var socket = io.connect( "http://"+window.location.host+'/discover');
 	socket.on('room', function(event, eventType) {
 		console.log("room !!!!");
@@ -755,4 +770,4 @@ var IndexCtrl = function($scope, $location) {
 }
 
 
-IndexCtrl.$inject = ['$scope', '$location'];
+IndexCtrl.$inject = ['$scope', '$location','$rootScope','$cookies'];

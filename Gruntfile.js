@@ -26,7 +26,8 @@ module.exports = function(grunt) {
           yuicompress: true
         },
         files: {
-          "<%= distdir %>/src/public/stylesheets/tetrinet.css": "src/public/stylesheets/tetrinet.less"
+          "<%= distdir %>/src/public/stylesheets/tetrinet.css": "src/public/stylesheets/tetrinet.less",
+          "src/public/stylesheets/tetrinet.css": "src/public/stylesheets/tetrinet.less"
         }
       },
       production: {

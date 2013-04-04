@@ -16,18 +16,19 @@ var app = express();
 
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 80);
+  app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(express.favicon());
   app.use(express.compress());
   app.use(express.logger('dev'));
+  //app.use(express.static(__dirname+"/public", {maxAge: 60*60*24}));
   //app.use(express.bodyParser());
   //app.use(express.methodOverride());
   app.use(express.cookieParser('your secret here'));
   app.use(express.session());
   app.use(app.router);
-  //app.use(require('less-middleware')({ src: __dirname + '/public' }));
+  app.use(require('less-middleware')({ src: __dirname + '/public' }));
 
   /*app.use(expressUglify.middleware({ 
     src: __dirname + '/public',
@@ -49,6 +50,7 @@ io.enable('browser client minification');
 io.enable('browser client etag');
 io.enable('browser client gzip');
 io.set('log level',1);
+io.set('flash policy port',-1);
 
 
 app.configure('development', function(){

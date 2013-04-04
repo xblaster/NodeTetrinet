@@ -22,7 +22,7 @@
 
 
 
-@gameColorSec : spin(@gameColor,-50);
+
 @cellSize: 15px;
 
 @textColor: lighten(@gameColor, 5%);
@@ -77,10 +77,32 @@
 
 // Hero unit
 // -------------------------
-@heroUnitBackground:              lighten(@bodyBackground,5%);
-@heroUnitHeadingColor:            lighten(@textColor,70%);
-@heroUnitLeadColor:               @textColor;
+@heroUnitBackground:              @gameColorSec;
+@heroUnitHeadingColor:            lighten(@gameColorSec,70%);
+@heroUnitLeadColor:               @gameColorSec;
 
+.hero-unit p {
+	color: lighten(@gameColorSec,50%);
+}
+
+.hero-unit a {
+	color: lighten(@gameColorSec,60%);
+}
+
+
+input[type="text"], textarea, .editable {
+	background-color: @bodyBackground;
+	border: 1px solid @gameColor;
+	color: lighten(@gameColor, 30%);
+}
+
+.editable {
+	padding: 0.2em;
+}
+
+.clickable {
+	cursor: pointer;
+}
 
 
 //@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 20%);
@@ -268,4 +290,5 @@ p, div {
 	background-color: mix(@bodyBackground, white, 95%);
 	box-shadow: inset 0px 0px 1px 1px rgba(255,255,255,0.1);
 }
+
 
