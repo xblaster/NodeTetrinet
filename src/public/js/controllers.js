@@ -747,7 +747,7 @@ var IndexCtrl = function($scope, $location, $rootScope, $cookies) {
 	$scope.changeMode = function(mode) { $scope.mode = mode ;}
 
 	$scope.isAnonymous = function() {
-		return ($rootScope.nickname.indexOf("Anonymous")===-1);
+		return $rootScope.nickname.indexOf("Anonymous")!==-1;
 	}
 
 	$scope.changeNickname = function(nickname) {

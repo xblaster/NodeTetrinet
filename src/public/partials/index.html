@@ -1,16 +1,18 @@
 <div class="row hero-unit"  >
 	<div class="span8">
 		<h1>Node Tetrinet</h1>
-
+		<hr/>
+		<form ng-submit="changeNickname(nickname); mode ='read'">
 		<p class="">Welcome 
-			<span class="clickable editable" ng-show="mode!='edit'" ng-click="mode='edit';">"{{nickname}}"</span>
-			<span ng-show="mode=='edit'" ng-submit="changeNickname(nickname); mode ='read'">
+			<span class="clickable editable" ng-show="mode!='edit'" ng-click="mode='edit';">{{nickname}}</span>
+			<span ng-show="mode=='edit'">
 				<input type="text" ng-model="nickname" ng-change="changeNickname(nickname)"/>
 			</span>
 			on Node Tetrinet, a fully funny and working implementation of multiplayer tetrinet battles with <a href="http://nodejs.org">node.js</a>
 		, <a href="http://angularjs.org">angularjs</a>, <a href="http://twitter.github.com/bootstrap">bootstrap</a> and <a href="http://socket.io">socket.io</a></p>
 
-		<p>It's you first connection ? Click on {{nickname}}</p>
+		<p ng-show="isAnonymous()"><b>It's you first connection ?</b> Click on "{{nickname}}" just above to change it !</p>
+		</form>
 	</div>
 </div>
 <div class="row">
