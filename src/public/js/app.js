@@ -46,10 +46,14 @@ function($routeProvider) {
 				console.log($rootScope);
 				if ($rootScope.mode === "game") {
 					$rootScope.mode = "chat";
+					$("#message").removeAttr("disabled");
+					
 					$("#message").focus();
 					$("#message").click();
+
 				} else {
 					$rootScope.mode = "game";
+					$("#message").attr("disabled","disabled");
 					$("#game").focus();
 					$("#game").click();
 				}

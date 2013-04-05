@@ -86,6 +86,8 @@ io.of('/chat')
 
         socket.emit('say',{author: 'server', text: "Welcome to game "+roomN, at: new Date().getTime()})
 
+        updatePeopleInRoom(roomN);
+
       });
 
       socket.on('say', function(message) {
@@ -150,58 +152,72 @@ io.of('/game')
             updatePeopleOnDiscover();
             socket.emit('owner');          
         }
-
+        io.of('/chat').in(roomN).emit('say',{author: 'server', text: nickname+" has join the game", at: new Date().getTime()});
+        updatePeopleInRoom(roomN);
         //socket.emit('start');
       });
 
       var requestNewOwner = function() {
-              var newOwner = io.of(roomN).clients(roomN)[0];
+              var newOwner = io.of("/game").clients(roomN)[0];
               if (newOwner) {
-                console.log(newOwner);
-                 //newOwner.emit('owner');
-                 //getRoom(roomN).owner = newOwner.nickname;
+                io.of("/game").in(roomN).socket(newOwner.id).emit('owner');
+                getRoom(roomN).owner = newOwner.nickname;
               }
       }
 
       //awful code
+      //TODO need to rewrite and not put attr on socket !
       var onleave = function() {
-
+        console.log("onleave");
+        //if no room
         if (!getRoom(roomN)) {
           return;
         }
         var people = getRoom(roomN).people;
         people = _.without(people,nickname);
 
+        getRoom(roomN).people = people;
+
+        updatePeopleInRoom(roomN);
+
         if(!socket) {
           return;
         }
 
-        if (io.of('/game').clients(roomN).length <= 1) {
+        socket.leave(roomN);
+
+        //if you are the only one in the room
+        if (io.of('/game').clients(roomN).length <= 0) {
           delete availableRooms[roomN];
           updatePeopleOnDiscover();
           
           //leave the room;
-          socket.leave(roomN);
+         
           return;
-        } else {
+        }
 
-        //leave the room;
-        socket.leave(roomN);
-          //if leaving guy is the owner
-          console.log("leaving");
-          console.log(getRoom(roomN).owner);
+        //if leaving guy is the owner
+        console.log("leaving");
+        console.log(getRoom(roomN).owner +" / "+nickname);
           if (getRoom(roomN).owner == nickname) {
               requestNewOwner();
           }
-        } 
-      }
 
-      socket.on('win', function() {
+        updatePeopleInRoom(roomN);
+      };
+
+      socket.on('win', _.once(function() {
         io.of('/chat').in(roomN).emit('say',{author: 'server', text: nickname+" has won the game !", at: new Date().getTime()});
-      });
+        io.of('/chat').in(roomN).emit('win');
+      }));
 
-      socket.on('disconnect',onleave);
-      socket.on('leave', onleave);
+      socket.on('disconnect',function() {
+        io.of('/chat').in(roomN).emit('say',{author: 'server', text: nickname+" has left the game", at: new Date().getTime()});
+        onleave();
+      });
+      socket.on('leave', function() {
+        //do nothing
+      });
 
       
       socket.on('updateGameField', function(opt) { 

@@ -1,6 +1,6 @@
-<div ng-controller="ChatCtrl" ng-class="{shaded : mode != 'chat'}">
+<div ng-controller="ChatCtrl" ng-class="{shaded : mode != 'chat'}" id="chat">
 
-<h1>Controls</h1>
+<h1><i class="icon-cog icon-x4"></i> 	Controls</h1>
 
 <ul>
 	<li>&rarr;: move right</li>
@@ -11,7 +11,12 @@
 	<li>[Tab]: switch beetween game and chat</li>
 </ul>
 
-<h1>Chat</h1>
+<h1><i class="icon-comment icon-x4"></i> Chat</h1>
+	<div>
+		<span ng-repeat="nickname in people" class="nickname">
+			<i class="icon-user"></i> {{nickname}}
+		</span>
+	</div>
 	<div ng-repeat="line in lines">
 		<small>{{line.at | date:'HH:mm:ss'}}</small><b>&lt;{{line.author}}&gt;</b> {{line.text}}
 	</div>

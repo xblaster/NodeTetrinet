@@ -728,6 +728,13 @@ var ChatCtrl= function($scope, $routeParams, $rootScope) {
 		$scope.message = "";
 	}
 
+	socket.on('people', function(event, eventType) {
+		console.log(event);
+		$scope.$apply(function(){
+			$scope.people = event;
+		});
+	});
+
 	$scope.$on("$destroy", function() {
 		socket.disconnect();
 	});
@@ -742,6 +749,7 @@ ChatCtrl.$inject = ['$scope', '$routeParams','$rootScope'];
 var IndexCtrl = function($scope, $location, $rootScope, $cookies) {
 
 	$scope.mode = 'read';
+	$scope.connected = false;
 
 
 	$scope.changeMode = function(mode) { $scope.mode = mode ;}
@@ -757,10 +765,14 @@ var IndexCtrl = function($scope, $location, $rootScope, $cookies) {
 
 	var socket = io.connect( "http://"+window.location.host+'/discover');
 	socket.on('room', function(event, eventType) {
-		console.log("room !!!!");
+		if ($scope.connected === false) {
+			$scope.connected = true;
+		}
 		$scope.rooms = event;
 		$scope.$apply();
-	})
+	});
+
+
 
 	$scope.startNewGame = function() {
 		$location.path("/game/"+Math.floor(Math.random()*9999));

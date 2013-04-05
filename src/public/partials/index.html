@@ -15,9 +15,14 @@
 		</form>
 	</div>
 </div>
-<div class="row">
+<div class="row" ng-show="connected === false">
 	<div class="span6">
-		<h1>Actions</h1>
+		<h1><i class="icon-spinner icon-spin icon-x4"></i> Connecting...	</h1>
+	</div>
+</div>
+<div class="row" ng-show="connected === true">
+	<div class="span6">
+		<h1><i class="icon-play icon-x4"></i> Actions</h1>
 		<ul class="nav nav-list">
 			<li>
 				<a ng-click="startNewGame()">Start a new game </a>
@@ -26,11 +31,11 @@
 	</div>
 
 	<div class="span6">
-		<h1>Available rooms</h1>
-		<p ng-show="rooms.length == 0">No room</p>
+		<h1><i class="icon-th icon-x4"></i> Available rooms</h1>
+		<p ng-show="rooms.length == 0"><i class="icon-eye-close"></i> No open game. <a ng-click="startNewGame()">Start a new game ?</a>
 		<table class="table table-bordered table-striped" ng-show="rooms.length > 0">
 			<tr ng-repeat="room in rooms">
-				<td>{{room.name}}</td>
+				<td><i class="icon-group"></i> <b>{{room.name}}</b> by {{room.owner}}</td>
 				<td><a href="#/game/{{room.name}}" class="btn">join</a></td>
 			</tr>
 		</table>
