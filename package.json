@@ -10,7 +10,8 @@
     "ejs": "*",
     "less-middleware": "*",
     "socket.io": "*",
-    "express-uglify": "*"
+    "express-uglify": "*",
+    "lodash": "~1.1.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
