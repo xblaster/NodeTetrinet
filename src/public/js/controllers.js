@@ -18,6 +18,8 @@ tetris.BlockType = {
 	GREEN: 3,
 	RED: 4,
 	BLUE: 5,
+	PURPLE: 6,
+	YELLOW: 7,
 	GHOST: 999
 }
 
@@ -143,27 +145,6 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		return res;
 	}
 
-	$scope.getStyleFor = function(cell) {
-		if (cell == tetris.BlockType.EMPTY) {
-			return {backgroundColor: 'rgba(0,0,0,0.3)'};
-		} 
-		if (cell == tetris.BlockType.GREY) {
-			return {backgroundColor: 'rgba(100,100,100,0.3)'};
-		} 
-		if (cell == tetris.BlockType.GHOST) {
-			return {backgroundColor: 'rgba(0,0,0,0.2)', boxShadow: 'inset 0px 0px 3px 1px rgba(255,255,255,0.1)'};
-		} 
-		if (cell == tetris.BlockType.GREEN) {
-			return {backgroundColor: 'rgba(0,255,0,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
-		} 
-		if (cell == tetris.BlockType.RED) {
-			return {backgroundColor: 'rgba(255,0,0,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
-		} 
-		if (cell == tetris.BlockType.BLUE) {
-			return {backgroundColor: 'rgba(0,0,255,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
-		} 
-		return {backgroundColor: 'rgba(0,255,0,0.3)', boxShadow: 'inset 0px 0px 5px 1px rgba(255,255,255,0.2)'};
-	}
 
 
 
@@ -342,7 +323,9 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	
 
 	var sendDropTick = function() {
-		$rootScope.$broadcast('drop', {})
+		console.log("send drop");
+		//$rootScope.$broadcast('drop', {})
+		onDropTick({});
 	}
 
 
@@ -371,14 +354,22 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	//if destroy, remove ticket
 	//TODO find a more elegant way to do that
 	$scope.$on("$destroy", function(event, eventType) {
+		console.log("destroy controller");
 		$timeout.cancel(timeoutId);
+		socket.emit('leave', {});
+		socket.disconnect();
+
+		//$scope.$destroy();
 	});
 
-	$scope.$on('drop', function(eventType, event) {
+	//$scope.$on('drop', function(eventType, event) {
+	var onDropTick = function(event) {
+		console.log("timeout");
 
 		if (!event.force)//if not a force drop 
 		{
 			//launch next tick and store timeout id
+
 			timeoutId = $timeout(sendDropTick, getGameTick());
 		}
 
@@ -392,7 +383,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 				//refresh game screen
 				$scope.refresh();
 		}
-	});
+	};
 
 	var wallKick = function (zone, block) {
 		if (!testHitBlock(zone, block)) {
@@ -436,7 +427,8 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		if (eventType == tetris.GameEventEnum.UP) {
 			nextBlockPos.rotate() ;
 		} else if (eventType == tetris.GameEventEnum.DOWN) {
-			$rootScope.$broadcast('drop', {force: true})
+			//$rootScope.$broadcast('drop', {force: true})
+			onDropTick({force: true});
 			return;
 		} else if (eventType == tetris.GameEventEnum.LEFT) {
 			nextBlockPos.y -=1;
@@ -445,7 +437,8 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		} else if (eventType == tetris.GameEventEnum.DROP) {
 
 			current_block = getGravitiedBlock($scope.hiddenZone,nextBlockPos);
-			$rootScope.$broadcast('drop', {force: true})
+			//$rootScope.$broadcast('drop', {force: true})
+			onDropTick({force: true});
 			$scope.refresh();
 			return;
 		}
@@ -594,10 +587,12 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	}
 
 	$scope.askNewBlock = function () {
-		current_block = new Block(cloneZone(blocks[Math.floor(Math.random()*blocks.length)]));
+		var pieceIdx = Math.floor(Math.random()*blocks.length)
+		current_block = new Block(cloneZone(blocks[pieceIdx]));
 		current_block.x = 0;
 		current_block.y = 5;
-		current_block.typeB = 3+Math.floor(Math.random()*3);
+		//current_block.typeB = 3+Math.floor(Math.random()*3);
+		current_block.typeB = pieceIdx+2;
 
 		//if block it on placement... game over
 		if (testHitBlock($scope.hiddenZone, current_block)) {
@@ -698,10 +693,6 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 	//$scope.refresh();
 
-	$scope.$on("$destroy", function() {
-		socket.emit('leave', {});
-		socket.disconnect();
-	});
 	
 };
 

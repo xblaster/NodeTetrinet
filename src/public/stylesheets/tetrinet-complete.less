@@ -275,9 +275,28 @@ p, div {
 }
 
 
+@cyanBlock: mix(@bodyBackground, #0FF, 70%);
+@purpleBlock: mix(@bodyBackground, #F0F, 70%);
+@yellowBlock: mix(@bodyBackground, #FF0, 70%);
 @greenBlock: mix(@bodyBackground, #0F0, 70%);
 @redBlock: mix(@bodyBackground, #F00, 70%);
 @blueBlock: mix(@bodyBackground, #00F, 70%);
+
+/*EMPTY: 0,
+	GREY: 1,
+	CYAN: 2,
+	GREEN: 3,
+	RED: 4,
+	BLUE: 5,
+	PURPLE: 6,
+	YELLOW: 7,*/
+
+/* cyan */
+.block2 {
+	background-color: @cyanBlock;
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@cyanBlock, 10%), 30%);
+}
+
 
 /* green */
 .block3 {
@@ -296,6 +315,33 @@ p, div {
 	background-color: mix(@bodyBackground, blue, 70%);
 	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@blueBlock, 30%), 30%);
 }
+
+/* purple */
+.block6{
+	background-color: mix(@bodyBackground, @purpleBlock, 10%);
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@purpleBlock, 30%), 30%);
+}
+
+/* yellow */
+.block7{
+	background-color: mix(@bodyBackground, @yellowBlock, 10%);
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@yellowBlock, 30%), 30%);
+}
+
+@secretL: mix(@bodyBackground, #FA6900, 70%);
+.block8{
+	background-color: mix(@bodyBackground, @secretL, 10%);
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@secretL, 50%), 30%);
+}
+
+
+@secretL2: mix(@bodyBackground, #8DC19B, 70%);
+.block9{
+	background-color: mix(@bodyBackground, @secretL2, 10%);
+	box-shadow: inset 0px 0px 1px 1px fadeout(lighten(@secretL2, 30%), 30%);
+}
+
+
 
 
 .block999 {
