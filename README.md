@@ -5,6 +5,17 @@ NodeTetrinet is an open source implementation of a Tetrinet clone with node.js, 
 
 # Launch your own server
 
-Checkout the project on command line
-    node app.js
+Checkout the project and type in a command line
+>npm install
 
+>node app.js
+
+# TODO LIST
+
+* add "special power" like in the original tetrinet to make the game more "fun"
+* clean the code. Some part are quite weird
+* do not set vars directly on socket
+
+# License
+Copyright (c) 2013 Jérôme WAX
+Licensed under the MIT license.
