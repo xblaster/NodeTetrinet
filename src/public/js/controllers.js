@@ -57,7 +57,6 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	var socket = io.connect( "http://"+window.location.host+'/game');
 	socket.emit("join",{roomName: $routeParams.id, nickname: $rootScope.nickname});
 
-
 	var current_block = [[]];
 
 	$scope.gameState = "";
@@ -335,16 +334,22 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 
 
-	$scope.$on('blockOnFloor' , function(eventType, event) {
+	var onBlockOnFloor =  function(eventType, event) {
+		console.log("blockOnFloor");
+		//stop update 
+		$timeout.cancel(timeoutId);
 		$scope.hiddenZone = addBlock($scope.hiddenZone, current_block);
 		$scope.hiddenZone = checkAndRemoveFullLine($scope.hiddenZone);
 		$scope.askNewBlock();
 
-		//$timeout(sendDropTick, getGameTick());
+		
 		$scope.refresh();
 
 		$scope.sendGameField();
-	});
+
+		//relaunch updateGAMEFIELD
+		timeoutId = $timeout(sendDropTick, getGameTick());
+	};
 
 	
 
@@ -364,7 +369,10 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 	//$scope.$on('drop', function(eventType, event) {
 	var onDropTick = function(event) {
-		console.log("timeout");
+
+		if ($scope.gameState != "on") { 
+			return;
+		}
 
 		if (!event.force)//if not a force drop 
 		{
@@ -373,11 +381,9 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 			timeoutId = $timeout(sendDropTick, getGameTick());
 		}
 
-		if ($scope.gameState != "on") { 
-			return;
-		}
+		
 		if (testHitBlock($scope.hiddenZone, getDroppedBlock(current_block))) {
-			$rootScope.$broadcast('blockOnFloor');
+			onBlockOnFloor();
 		} else {
 				current_block = getDroppedBlock(current_block);
 				//refresh game screen
