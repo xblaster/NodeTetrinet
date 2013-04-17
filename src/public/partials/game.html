@@ -16,7 +16,21 @@
 			<a ng-click="launchGame()" class="btn btn-large">Launch the game</a>
 		</div>
 
-		<div>
+		<div class="hidden-desktop" >
+			<div ng-show="gameState == 'on'">
+				<div class="btn" ng-click="sendGameEvent(3)">
+					<i class="icon-arrow-left icon-4x"></i>
+				</div>
+				<div class="btn" ng-click="sendGameEvent(5)">
+					<i class="icon-arrow-down icon-4x"></i>
+				</div>
+				<div class="btn" ng-click="sendGameEvent(4)">
+					<i class="icon-arrow-right icon-4x"></i>
+				</div>
+				<div class="btn pull-right" ng-click="sendGameEvent(1)">
+					<i class="icon-repeat icon-4x"></i>
+				</div>
+			</div>
 		</div>
 	</div>
 

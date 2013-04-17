@@ -631,6 +631,9 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		return returnZone;
 	}
 
+	$scope.sendGameEvent = function(event) {
+		$rootScope.$broadcast('gameEvent', event);
+	}
 
 	$scope.init = function() {
 		//init game
