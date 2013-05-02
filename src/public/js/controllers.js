@@ -752,6 +752,7 @@ var IndexCtrl = function($scope, $location, $rootScope, $cookies) {
 	$scope.connected = false;
 
 
+
 	$scope.changeMode = function(mode) { $scope.mode = mode ;}
 
 	$scope.isAnonymous = function() {
