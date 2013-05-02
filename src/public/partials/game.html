@@ -16,7 +16,7 @@
 			<a ng-click="launchGame()" class="btn btn-large">Launch the game</a>
 		</div>
 
-		<div class="hidden-desktop" >
+		<div class="hidden-on-desktop">
 			<div ng-show="gameState == 'on'">
 				<div class="btn" ng-click="sendGameEvent(3)">
 					<i class="icon-arrow-left icon-4x"></i>
@@ -34,13 +34,13 @@
 		</div>
 	</div>
 
-	<div class="span5">	
+	<div class="span5 hidden-on-phone">	
 		<div  ng-include="'partials/chat.html'"></div>
 
 		
 
 	</div>
-	<div class="span4">
+	<div class="span4 hidden-on-phone">
 		<h2>GameZone</h2>
 		<div ng-repeat="(nickname, opt) in gameFields" class="span2">
 			<table class="game-zone"  ng-class="{gray: opt.status =='gameover'}">
