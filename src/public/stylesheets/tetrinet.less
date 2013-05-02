@@ -5,3 +5,34 @@
 @gameColorTer : #FEFF65;
 @import "tetrinet-complete.less";
 
+
+.hidden-on-desktop {
+		display: none;
+}
+
+
+.first-div {
+	margin-top: 70px;
+	padding-top: 10px;
+}
+
+@media (max-width: 768px) {
+
+	.first-div {
+		margin-top: 0px;
+		padding-top: 0px;
+	}
+
+	.disclaimer {
+			display: none;
+	}
+
+	.hidden-on-phone {
+		display: none;
+	}
+
+	.hidden-on-desktop {
+		display: inherit;
+	}
+}
+
