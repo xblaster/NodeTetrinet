@@ -6,6 +6,7 @@
 @import "tetrinet-complete.less";
 
 
+
 .hidden-on-desktop {
 		display: none;
 }
@@ -16,7 +17,22 @@
 	padding-top: 10px;
 }
 
+.game-cell {
+	height: @cellSize;
+	width: @cellSize;
+	border-top: 1px solid @borderColor;
+	border-left: 1px solid @borderColor;
+}
+
+
 @media (max-width: 768px) {
+
+	.game-cell {
+		height: 10px;
+		width: 10px;
+		border-top: 1px solid @borderColor;
+		border-left: 1px solid @borderColor;
+	}
 
 	.first-div {
 		margin-top: 0px;
