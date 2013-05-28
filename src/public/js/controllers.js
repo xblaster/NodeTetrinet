@@ -92,7 +92,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		//console.log('updateGAMEFIELD !!!')
 		$scope.$apply(function() {
 			$scope.gameFields[opt.nickname] = $scope.gameFields[opt.nickname] || {};
-			$scope.gameFields[opt.nickname].zone = opt.zone;	
+			$scope.gameFields[opt.nickname].zone =applyZoneWithVal(opt.zone,$scope.gameFields[opt.nickname].zone);	
 		})
 	});
 
@@ -463,7 +463,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	$scope.refresh = function() {
 		var ghostedZone = addBlock($scope.hiddenZone,getGravitiedBlock($scope.hiddenZone, current_block),tetris.BlockType.GHOST );
 		var withBlockZone = addBlock(ghostedZone,current_block);
-		applyZone(withBlockZone, $scope.zone);
+		applyZoneWithVal(withBlockZone, $scope.zone);
 		$scope.$digest();
 	}
 
@@ -658,6 +658,8 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 			}	
 
 		$scope.zone = cloneZone($scope.hiddenZone);
+		applyZoneWithVal($scope.hiddenZone, $scope.zone);
+		
 	}
 
 
@@ -691,6 +693,31 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 			for (var j = 0; j< zone1[i].length; j++) {
 				if (zone2[i][j] !== zone1[i][j]) {
 					zone2[i][j] = zone1[i][j];
+				}
+			}
+		}
+	}
+
+	function applyZoneWithVal(zone1, zone2) {
+
+		if (!_.isArray(zone2)) {
+			zone2 = [];
+		}
+
+		for (var i = 0; i< zone1.length; i++) {
+
+			if (!_.isArray(zone2[i])) {
+				zone2[i]= [];
+			}	
+
+			for (var j = 0; j< zone1[i].length; j++) {
+
+				if (!_.isObject(zone2[i][j])) {
+					zone2[i][j]= {val: 0};
+				}	
+
+				if (zone2[i][j].val !== zone1[i][j]) {
+					zone2[i][j].val = zone1[i][j];
 				}
 			}
 		}
