@@ -59,6 +59,21 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 	var current_block = [[]];
 
+	var __mapOfBinding = [];
+
+	var unregisterAllBinding = function() {
+		console.log("unregister");
+		console.log(__mapOfBinding);
+			for (var i = 0; i < __mapOfBinding.length; i++) {
+				console.log("unregister "+__mapOfBinding[i]);
+				__mapOfBinding[i]();
+			}
+	}
+
+	$scope.registerBinding = function(binding) {
+		__mapOfBinding.push(binding);
+	}
+
 	$scope.gameState = "";
 
 
@@ -116,13 +131,13 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		}
 	});
 	
-	$scope.$on('youwin', function(event, eventType) {		//socket.emit("gameover",{});
+	$scope.registerBinding($scope.$on('youwin', function(event, eventType) {		//socket.emit("gameover",{});
 		if ($scope.gameState!== "You win !") {
 			$scope.gameState = "You win !";
 			socket.emit('win');
 		}
 		
-	});
+	}));
 
 
 	var totalLine = 0;	
@@ -323,7 +338,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 	var sendDropTick = function() {
 		console.log("send drop");
-		//$rootScope.$broadcast('drop', {})
+		//$rootScope.$emit('drop', {})
 		onDropTick({});
 	}
 
@@ -332,6 +347,8 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		return 1000;
 	}
 
+
+	var timeoutId;
 
 
 	var onBlockOnFloor =  function(eventType, event) {
@@ -354,18 +371,18 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	
 
 
-	var timeoutId;
+	
 
 	//if destroy, remove ticket
 	//TODO find a more elegant way to do that
-	$scope.$on("$destroy", function(event, eventType) {
+	$scope.registerBinding($scope.$on("$destroy", function(event, eventType) {
 		console.log("destroy controller");
+		$scope.gameState = "gameover";
 		$timeout.cancel(timeoutId);
 		socket.emit('leave', {});
 		socket.disconnect();
-
-		//$scope.$destroy();
-	});
+		unregisterAllBinding();
+	}));
 
 	//$scope.$on('drop', function(eventType, event) {
 	var onDropTick = function(event) {
@@ -416,12 +433,13 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		return false;
 	}
 
-	$scope.$on('gameover', function(event, eventType) {
+	$scope.registerBinding($scope.$on('gameover', function(event, eventType) {
 		socket.emit("gameover",{});
 		$scope.gameState = "gameover";
-	});
+		$timeout.cancel(timeoutId);
+	}));
 
-	$scope.$on('gameEvent', function(event, eventType) {
+	$scope.registerBinding($scope.$on('gameEvent', function(event, eventType) {
 
 		if ($scope.gameState != "on") {
 			return;
@@ -433,7 +451,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		if (eventType == tetris.GameEventEnum.UP) {
 			nextBlockPos.rotate() ;
 		} else if (eventType == tetris.GameEventEnum.DOWN) {
-			//$rootScope.$broadcast('drop', {force: true})
+			//$rootScope.$emit('drop', {force: true})
 			onDropTick({force: true});
 			return;
 		} else if (eventType == tetris.GameEventEnum.LEFT) {
@@ -443,7 +461,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		} else if (eventType == tetris.GameEventEnum.DROP) {
 
 			current_block = getGravitiedBlock($scope.hiddenZone,nextBlockPos);
-			//$rootScope.$broadcast('drop', {force: true})
+			//$rootScope.$emit('drop', {force: true})
 			onDropTick({force: true});
 			$scope.refresh();
 			return;
@@ -457,7 +475,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 		$scope.refresh();
 		return;
-	});
+	}));
 
 
 	$scope.refresh = function() {
@@ -585,7 +603,13 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		for (var i = 0; i < 4; i++) {
 			for (var j = 0; j < 4; j++) {
 				if (block.getPattern()[i][j]!= tetris.BlockType.EMPTY) {
-				returnZone[block.x+i][block.y+j] = type;
+					//if out of range
+					if (_.isArray(returnZone[block.x+i])) {
+						returnZone[block.x+i][block.y+j] = type;		
+					} else {
+						console.log("error occured in addBlock");
+					}
+				
 				}
 			}	
 		}
@@ -602,7 +626,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 		//if block it on placement... game over
 		if (testHitBlock($scope.hiddenZone, current_block)) {
-			$rootScope.$broadcast('gameover');
+			$rootScope.$emit('gameover');
 		}
 
 	}	
@@ -632,7 +656,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	}
 
 	$scope.sendGameEvent = function(event) {
-		$rootScope.$broadcast('gameEvent', event);
+		$rootScope.$emit('gameEvent', event);
 	}
 
 	$scope.init = function() {
@@ -657,6 +681,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 				$scope.hiddenZone[23][j] = 1;
 			}	
 
+		//need to find a better way than cloning zone
 		$scope.zone = cloneZone($scope.hiddenZone);
 		applyZoneWithVal($scope.hiddenZone, $scope.zone);
 		
@@ -762,9 +787,9 @@ var ChatCtrl= function($scope, $routeParams, $rootScope) {
 		});
 	});
 
-	$scope.$on("$destroy", function() {
+	$scope.registerBinding($scope.$on("$destroy", function() {
 		socket.disconnect();
-	});
+	}));
 
 	socket.emit("join",{roomName: $routeParams.id, nickname: $rootScope.nickname});
 }
