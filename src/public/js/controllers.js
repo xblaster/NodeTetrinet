@@ -111,7 +111,10 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		//console.log('updateGAMEFIELD !!!')
 		$scope.$apply(function() {
 			$scope.gameFields[opt.nickname] = $scope.gameFields[opt.nickname] || {};
-			$scope.gameFields[opt.nickname].zone =applyZoneWithVal(opt.zone,$scope.gameFields[opt.nickname].zone);	
+			if ($scope.gameFields[opt.nickname].zone === undefined) {
+				$scope.gameFields[opt.nickname].zone = cloneZone(opt.zone);
+			}
+			applyZoneWithVal(opt.zone,$scope.gameFields[opt.nickname].zone);	
 		})
 	});
 
@@ -342,7 +345,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 	var sendDropTick = function() {
 		console.log("send drop");
-		//$rootScope.$emit('drop', {})
+		//$rootScope.$broadcast('drop', {})
 		onDropTick({});
 	}
 
@@ -456,7 +459,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		if (eventType == tetris.GameEventEnum.UP) {
 			nextBlockPos.rotate() ;
 		} else if (eventType == tetris.GameEventEnum.DOWN) {
-			//$rootScope.$emit('drop', {force: true})
+			//$rootScope.$broadcast('drop', {force: true})
 			onDropTick({force: true});
 			return;
 		} else if (eventType == tetris.GameEventEnum.LEFT) {
@@ -466,7 +469,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		} else if (eventType == tetris.GameEventEnum.DROP) {
 
 			current_block = getGravitiedBlock($scope.hiddenZone,nextBlockPos);
-			//$rootScope.$emit('drop', {force: true})
+			//$rootScope.$broadcast('drop', {force: true})
 			onDropTick({force: true});
 			$scope.refresh();
 			return;
@@ -631,7 +634,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 		//if block it on placement... game over
 		if (testHitBlock($scope.hiddenZone, current_block)) {
-			$rootScope.$emit('gameover');
+			$rootScope.$broadcast('gameover');
 		}
 
 	}	
@@ -661,7 +664,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	}
 
 	$scope.sendGameEvent = function(event) {
-		$rootScope.$emit('gameEvent', event);
+		$rootScope.$broadcast('gameEvent', event);
 	}
 
 	$scope.init = function() {
