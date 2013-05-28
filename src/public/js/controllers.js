@@ -55,6 +55,7 @@ Block.prototype.rotate = function() {
 function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) {
 	
 	var socket = io.connect( "http://"+window.location.host+'/game');
+	window.socket = socket;
 	socket.emit("join",{roomName: $routeParams.id, nickname: $rootScope.nickname});
 
 	var current_block = [[]];
@@ -62,12 +63,12 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 	var __mapOfBinding = [];
 
 	var unregisterAllBinding = function() {
-		console.log("unregister");
-		console.log(__mapOfBinding);
+		console.log("unregister all bindings");
 			for (var i = 0; i < __mapOfBinding.length; i++) {
-				console.log("unregister "+__mapOfBinding[i]);
+				//console.log("unregister "+__mapOfBinding[i]);
 				__mapOfBinding[i]();
 			}
+
 	}
 
 	$scope.registerBinding = function(binding) {
@@ -79,6 +80,9 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 
 	socket.on('start', function(message) {
 		socket.emit('updateGameField', $scope.hiddenZone);
+
+		console.log("start receive");
+
 		$scope.gameState = "on";
 		$scope.askNewBlock();
 		sendDropTick();
@@ -380,6 +384,7 @@ function GameCtrl($scope, $http, $location, $rootScope, $timeout, $routeParams) 
 		$scope.gameState = "gameover";
 		$timeout.cancel(timeoutId);
 		socket.emit('leave', {});
+		socket.removeAllListeners();
 		socket.disconnect();
 		unregisterAllBinding();
 	}));
@@ -787,9 +792,10 @@ var ChatCtrl= function($scope, $routeParams, $rootScope) {
 		});
 	});
 
-	$scope.registerBinding($scope.$on("$destroy", function() {
+	$scope.$on("$destroy", function() {
+		socket.removeAllListeners();
 		socket.disconnect();
-	}));
+	});
 
 	socket.emit("join",{roomName: $routeParams.id, nickname: $rootScope.nickname});
 }
