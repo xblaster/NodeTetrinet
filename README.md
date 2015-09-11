@@ -10,6 +10,12 @@ Checkout the project and type in a command line
 
 >node app.js
 
+For an easier setup you can use docker
+
+> docker run -d -p 3000:3000 xblaster/tetrinet
+
+And it will rocks ;)
+
 # TODO LIST
 
 * add "special power" like in the original tetrinet to make the game more "fun"
