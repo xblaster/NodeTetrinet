@@ -3,18 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app",
-    "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "start": "node app"
   },
   "dependencies": {
-    "express": "4.16.0",
+    "express": "3.1.0",
     "ejs": "*",
     "less-middleware": "*",
-    "socket.io": "~1.0.1",
+    "socket.io": "~2.0.2",
     "express-uglify": "*",
-    "lodash": "~4.17.5",
-    "snyk": "^1.90.0"
+    "lodash": "~1.1.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -29,6 +26,5 @@
     "grunt-string-replace": "~0.2.3",
     "grunt-jslint": "~0.2.5a",
     "grunt-contrib-watch": "~0.3.1"
-  },
-  "snyk": true
+  }
 }
