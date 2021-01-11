@@ -9,7 +9,7 @@
     "express": "3.1.0",
     "ejs": "*",
     "less-middleware": "*",
-    "socket.io": "~2.0.2",
+    "socket.io": "~3.0.0",
     "express-uglify": "*",
     "lodash": "~1.1.1"
   },
