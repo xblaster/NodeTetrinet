@@ -8,7 +8,7 @@
     "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
-    "express": "3.1.0",
+    "express": "3.4.0",
     "ejs": "*",
     "less-middleware": "*",
     "socket.io": "~2.4.0",
