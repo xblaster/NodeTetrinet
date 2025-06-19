@@ -14,7 +14,6 @@ module.exports = function(grunt) {
         files: {
           '<%= distdir %>/src/public/js/app.js': 'src/public/js/app.js',
           '<%= distdir %>/src/public/js/lib/angular.js': 'src/public/js/lib/angular.js',
-          '<%= distdir %>/src/public/js/jquery-latest.js': 'src/public/js/jquery-latest.js',
           '<%= distdir %>/src/public/js/controllers.js': 'src/public/js/controllers.js'
           
         }

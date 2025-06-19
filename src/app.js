@@ -44,14 +44,9 @@ app.configure(function(){
 });
 
 var server = http.createServer(app);
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server);
 
-//configure for production
-io.enable('browser client minification');
-io.enable('browser client etag');
-io.enable('browser client gzip');
-io.set('log level',1);
-io.set('flash policy port',-1);
+//configure for production (legacy settings removed for socket.io 2)
 
 
 app.configure('development', function(){
@@ -117,11 +112,12 @@ var updatePeopleInRoom = function(room) {
 }
 
 var getRoom = function (roomName) {
-    if (!io.sockets.manager.rooms["/game/"+roomName]) {
+    var room = io.of("/game").adapter.rooms[roomName];
+    if (!room) {
       return;
     }
-    io.sockets.manager.rooms["/game/"+roomName].people =  io.sockets.manager.rooms["/game/"+roomName].people ||[];
-    return io.sockets.manager.rooms["/game/"+roomName];
+    room.people = room.people || [];
+    return room;
 };
 
 
@@ -144,13 +140,12 @@ io.of('/game')
         nickname = socket.nickname = param.nickname || "anonymous";
 
 
-        getRoom(roomN).people.push(nickname);
-
-        if (io.of('/game').clients(roomN).length == 1) {
+       getRoom(roomN).people.push(nickname);
+        if ((io.of('/game').adapter.rooms[roomN]?.length || 0) === 1) {
             getRoom(roomN).owner = nickname;
             availableRooms[roomN] = {'owner': nickname};
             updatePeopleOnDiscover();
-            socket.emit('owner');          
+            socket.emit('owner');
         }
         io.of('/chat').in(roomN).emit('say',{author: 'server', text: nickname+" has join the game", at: new Date().getTime()});
         updatePeopleInRoom(roomN);
@@ -158,10 +153,11 @@ io.of('/game')
       });
 
       var requestNewOwner = function() {
-              var newOwner = io.of("/game").clients(roomN)[0];
-              if (newOwner) {
-                io.of("/game").in(roomN).socket(newOwner.id).emit('owner');
-                getRoom(roomN).owner = newOwner.nickname;
+              var clients = Object.keys(io.of('/game').adapter.rooms[roomN]?.sockets || {});
+              var newOwnerId = clients[0];
+              if (newOwnerId) {
+                io.of('/game').to(newOwnerId).emit('owner');
+                getRoom(roomN).owner = newOwnerId;
               }
       }
 
@@ -187,7 +183,7 @@ io.of('/game')
         socket.leave(roomN);
 
         //if you are the only one in the room
-        if (io.of('/game').clients(roomN).length <= 0) {
+        if ((io.of('/game').adapter.rooms[roomN]?.length || 0) <= 0) {
           delete availableRooms[roomN];
           updatePeopleOnDiscover();
           
@@ -222,12 +218,12 @@ io.of('/game')
       
       socket.on('updateGameField', function(opt) { 
         //io.of('/game').in(roomN).emit('updateGameField', {'nickname': nickname, 'zone': opt });  
-        sendToAllButYou('updateGameField', {'nickname': nickname, 'zone': opt }, '/game', roomN, socket.id);
+        sendToAllButYou('updateGameField', {'nickname': nickname, 'zone': opt }, '/game', roomN, socket);
       });
 
       socket.on('gameover', function(opt) { 
         //io.of('/game').in(roomN).emit('opponentGameOver', {'nickname': nickname });  
-        sendToAllButYou('opponentGameOver', {'nickname': nickname }, '/game', roomN, socket.id);
+        sendToAllButYou('opponentGameOver', {'nickname': nickname }, '/game', roomN, socket);
       });
 
      
@@ -250,21 +246,15 @@ io.of('/game')
           }
         }*/
         if (nbLine <4) {
-          sendToAllButYou('addLines', nbLine-1, '/game', roomN, socket.id);  
+          sendToAllButYou('addLines', nbLine-1, '/game', roomN, socket);
         } else {
-          sendToAllButYou('addLines', nbLine, '/game', roomN, socket.id);  
+          sendToAllButYou('addLines', nbLine, '/game', roomN, socket);
         }
         
       });
 
-      var sendToAllButYou = function(msgType, msgContent, of, room, socketId) {
-        for (var id in io.of(of).clients(room)) {
-          var loopSockId = io.of(of).clients(room)[id].id
-          if(socketId !== loopSockId) {
-            //io.clients[id].send('addLines', nbLine);
-            io.of(of).in(room).socket(loopSockId).emit(msgType, msgContent);
-          }
-        }
+      var sendToAllButYou = function(msgType, msgContent, namespace, room, sock) {
+        sock.to(room).emit(msgType, msgContent);
       }
 
   });

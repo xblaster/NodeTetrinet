@@ -1,14 +1,22 @@
 NodeTetrinet
 ============
 
-NodeTetrinet is an open source implementation of a Tetrinet clone with node.js, angular.js and socket.io.
+NodeTetrinet is an open source implementation of a Tetrinet clone with node.js, React and socket.io.
+
+The original frontend was built with AngularJS and is being migrated to React. The lobby, game page and chat are now implemented with React components.
 
 # Launch your own server
 
 Checkout the project and type in a command line
 >npm install
 
->node app.js
+>npm start
+
+Run the automated tests with:
+>npm test
+
+During development you can run:
+>npm run dev
 
 For an easier setup you can use docker
 
